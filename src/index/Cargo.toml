@@ -1,0 +1,21 @@
+[package]
+name = "index"
+version = "0.1.0"
+authors = [
+    "Aaron Elmore <aelmore@cs.uchicago.edu>",
+]
+edition = "2021"
+
+[lib]
+doctest = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+common = { path ="../common"}
+log = "0.4.11"
+env_logger = "0.7.1"
+txn_manager = { path = "../txn_manager"}
+storage = { path = "../storage"}
+# fbtree = { git = "https://github.com/rotaki/FosterBtree.git", branch = "master"}
+rand = { version = "0.9", features = ["small_rng"] }

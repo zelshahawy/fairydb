@@ -1,0 +1,11 @@
+statement ok
+create table test (a int primary key,b int,c int,d int)
+
+statement ok
+\i csv/data4x10.csv test
+
+match csv/data4x10.csv
+select * from test
+
+match csv/filter2.csv
+select * from test where test.b = 2

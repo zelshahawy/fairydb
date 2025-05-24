@@ -1,0 +1,23 @@
+#no primary key
+statement err
+create table test (a int, b int)
+
+#multiple inline primary keys
+statement err
+create table test (a int primary key, b int primary key)
+
+#multiple external primary keys
+statement err
+create table test (a int, b int, primary key(a), primary key(b))
+
+#both inline and external primary keys
+statement err
+create table test (a int primary key, b int, primary key(a))
+
+#table created successfully
+statement ok
+create table test (a int primary key, b int)
+
+#table already exists
+statement err
+create table test (a int primary key, b int)

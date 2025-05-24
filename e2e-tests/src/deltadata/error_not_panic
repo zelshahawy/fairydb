@@ -1,0 +1,31 @@
+statement ok
+create table test (a int primary key, b int)
+
+#trying to load csv that doesn't exist
+statement err
+\i csv/doesnt_exist.csv test
+
+#convert commmand without sql
+statement err
+\convert test.json |
+
+#convert commmand with multiple sql statements
+statement err
+\convert test.json | select * from table select * from table
+
+#trying to run query that has not been registered
+statement err
+\runFull query_doesnt_exist false 0
+
+#unsupported sql stuff where there werent checks before
+statement err
+\convert test.json | select * from test order by a
+
+statement err
+\convert test.json | select * from test limit 1
+
+statement err
+\convert test.json | select * from test offset 1
+
+statement err 
+\convert test.json with test_a as (select a from test) select * from test_a

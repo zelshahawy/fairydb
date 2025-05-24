@@ -1,0 +1,8 @@
+statement ok
+create table test (a int primary key, b int)
+
+statement ok
+\i csv/data.csv test
+
+match csv/filter1.csv
+select * from test where test.a = 1

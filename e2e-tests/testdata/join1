@@ -1,0 +1,20 @@
+statement ok
+create table t1 (a int primary key,b int)
+
+statement ok
+\i csv/data.csv t1
+
+statement ok
+create table t2 (c int primary key,d int,e int)
+
+statement ok
+\i csv/data2.csv t2
+
+match csv/data.csv
+select * from t1
+
+match csv/data2.csv
+select * from t2
+
+match csv/join1.csv
+select a, b, c, d, e from t1 join t2 on t1.b = t2.d

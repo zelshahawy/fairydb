@@ -1,0 +1,38 @@
+statement ok
+create table test (a int primary key, b int)
+
+statement ok
+\i csv/data.csv test
+
+#making sure that file is not created if sql is invalid
+statement err
+\convert select.json | select * from doesnt_exist
+
+statement ok
+\convert select.json | select * from test
+
+#ensuring that physical plan jsons are not overwritten
+statement err
+\convert select.json | select * from test
+
+statement ok
+\convert aggregate.json | select sum(a) from test where b = 2
+
+statement ok
+\register select.json select_query
+
+statement ok
+\register aggregate.json aggregate_query
+
+#trying to register plan that doesnt exist
+statement err
+\register doesnt_exist.json query_doesnt_exist
+
+statement ok
+\dq
+
+statement ok
+\runFull select_query false 0
+
+statement ok
+\runFull aggregate_query false 0

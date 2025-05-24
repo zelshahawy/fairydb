@@ -1,0 +1,42 @@
+statement ok
+create table test (a int primary key, b int)
+
+statement ok
+\i csv/data.csv test
+
+statement ok
+\convert simple_filter.json | select * from test where a < 0
+
+#compound predicate with and
+statement ok
+\convert and_filter.json | select * from test where a = 1 and b > 0 and b <=4
+
+#compound predicate with or
+statement ok
+\convert or_filter.json | select * from test where a = 1 or a = 3 or a = 4 or a = 100
+
+#compound predicate with both and and or -- not allowed
+statement err
+\convert mixed_filter.json | select * from test where a = 1 or b > 0 and b <= 4
+
+statement ok
+\register simple_filter.json simple_filter_query
+
+statement ok
+\register and_filter.json and_filter_query
+
+statement ok
+\register or_filter.json or_filter_query
+
+#ensuring that registered queries are not overwritten -- implemented in main but not yet merged in
+#statement err
+#\register simple_filter.json simple_filter_query
+
+statement ok
+\runFull simple_filter_query false 0
+
+statement ok
+\runFull or_filter_query false 0
+
+statement ok
+\runFull or_filter_query false 0

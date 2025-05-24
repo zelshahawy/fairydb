@@ -1,0 +1,8 @@
+statement ok
+create table test (a int primary key,b int,c int,d int)
+
+statement ok
+\i csv/data4x10.csv test
+
+match csv/max4bcd.csv
+select max(test.b), max(test.c), max(test.d) from test
