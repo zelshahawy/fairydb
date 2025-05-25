@@ -10,7 +10,7 @@ use serde_json;
 #[serde(default)]
 pub struct ServerConfig {
     /// Server IP address
-    #[clap(short = 'o', long = "host", default_value = "127.0.0.1")]
+    #[clap(short = 'o', long = "host", default_value = "0.0.0.0")]
     pub host: String,
     /// Server port number
     #[clap(short = 'p', long = "port", default_value = "3333")]
