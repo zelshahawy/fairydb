@@ -1,0 +1,18 @@
+#V2
+\\l
+\\r
+dlfda
+sdsad
+sd
+s
+lee
+\\shutdown
+\\l
+\\shutdown
+\\r testdb 
+\\c testdb
+CREATE TABLE test (a INT, b INT, primary key (a));
+\\i ./data.csv test
+SELECT a FROM test;
+SELECT sum(a), sum(b) FROM test;
+\\shutdown
