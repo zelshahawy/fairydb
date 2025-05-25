@@ -1,0 +1,38 @@
+[package]
+name = "common-fairy"
+version = "0.1.0"
+authors = ["Ziad Elshahawy <zelshahawy@uchicago.edu>"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+doctest = false
+
+
+[dependencies]
+csv = "1.3"
+serde = { version = "1.0", features = ["derive", "rc"] }
+serde_json = "1.0"
+serde_cbor = "0.11"
+rand = { version = "0.9", features = ["small_rng"] }
+log = "0.4"
+env_logger = "0.10"
+itertools = "0.12"
+chrono = "0.4"
+tempfile = "3.2"
+clap = { version = "4.5", features = ["derive"] }
+
+[features]
+mvcc = []
+inlinecc = ["mvcc"]
+
+[dev-dependencies]
+criterion = "0.5"
+
+[[bench]]
+name = "tuple_bench"
+harness = false
+
+[profile.bench]
+lto = false
