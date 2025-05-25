@@ -1,7 +1,7 @@
 [package]
-name = "txn_manager"
+name = "txn_manager-fairy"
 version = "0.1.0"
-authors = ["Aaron Elmore <aelmore@cs.uchicago.edu>"]
+authors = ["Ziad Elshahawy <zelshahawy@uchicago.edu>"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -16,4 +16,4 @@ env_logger = "0.10"
 common = { path = "../common" }
 
 [dev-dependencies]
-rand = {version = "0.9", features = ["small_rng"]}
+rand = { version = "0.9", features = ["small_rng"] }

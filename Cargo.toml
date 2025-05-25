@@ -1,25 +1,31 @@
+# Cargo.toml at the root of your repo
+
 [workspace]
+# use the new feature-resolver
 resolver = "2"
 
+# all of your path-based crates
 members = [
-    "src/cli-crusty",
-    "src/common",
-    "src/index",
-    "src/storage",
-    "src/optimizer",
-    "src/queryexe",
-    "src/server",
-    "src/txn_manager",
-    "src/utilities",
+    "src/cli-fairy",
+    "src/common-fairy",
+    "src/index-fairy",
+    "src/storage-fairy",
+    "src/optimizer-fairy",
+    "src/queryexe-fairy",
+    "src/server-fairy",
+    "src/txn_manager-fairy",
+    "src/utilities-fairy",
 ]
 
-exclude = [
-    "e2e-benchmarks",
-    "e2e-tests",
-]
+# any folders you never want Cargo to scan
+exclude = ["e2e-benchmarks", "e2e-tests"]
 
 [profile.release]
+# keep debug symbols in release builds
 debug = true
+# full link-time optimization
 lto = true
-panic = 'abort'
+# single codegen unit for optimal size/speed
 codegen-units = 1
+# abort on panic (instead of unwinding)
+panic = "abort"
