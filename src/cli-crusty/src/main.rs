@@ -1,4 +1,4 @@
-use cli_fairy::Client;
+use cli_crusty::Client;
 use common::physical::config::ClientConfig;
 
 fn main() {

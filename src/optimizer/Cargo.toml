@@ -1,0 +1,23 @@
+[package]
+name = "optimizer"
+version = "0.1.0"
+authors = [
+    "Aaron Elmore <aelmore@cs.uchicago.edu>",
+    "Raul Castro Fernandez <raulcf@uchicago.edu>",
+    "Daisy Barbanel", "Noah Banholzer",
+    "William Ma <williamma@uchicago.edu>"]
+edition = "2021"
+
+[lib]
+doctest = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+common = { path ="../common"}
+queryexe = { path ="../queryexe"}
+log = "0.4"
+env_logger = "0.10"
+sqlparser = "0.41"
+serde_json = "1.0"
+itertools = "0.12.1"
