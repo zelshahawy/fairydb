@@ -19,9 +19,9 @@ serde_cbor = "0.11"
 log = "0.4"
 env_logger = "0.10"
 tempfile = "3.2"
-common = { path = "../common-fairy" }
-storage = { path = "../storage-fairy" }
-txn_manager = { path = "../txn_manager-fairy" }
-queryexe = { path = "../queryexe-fairy" }
-optimizer = { path = "../optimizer-fairy" }
-index = { path = "../index-fairy" }
+common = { path = "../common" }
+storage = { path = "../storage" }
+txn_manager = { path = "../txn_manager" }
+queryexe = { path = "../queryexe" }
+optimizer = { path = "../optimizer" }
+index = { path = "../index" }
