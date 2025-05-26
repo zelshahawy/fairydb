@@ -277,8 +277,9 @@ impl Client {
             QueryResult::MessageOnly(message) => {
                 info!("Received Query Result: {}", message);
             }
-            QueryResult::Select { result, .. } => {
-                info!("Received Query Result: {:?}", result);
+            QueryResult::Select { .. } => {
+                // pretty‐print the table using the Display impl
+                println!("{}", result);
             }
             QueryResult::Insert {
                 inserted,

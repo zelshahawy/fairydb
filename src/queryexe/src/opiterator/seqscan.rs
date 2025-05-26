@@ -90,6 +90,11 @@ impl OpIterator for SeqScan {
 
         for (bytes, id) in file_iter.by_ref() {
             // Create the tuple
+            println!(
+                "DEBUG: SeqScan.next() got bytes.len={} value_id={:?}",
+                bytes.len(),
+                id
+            );
             let mut tuple = Tuple::from_bytes(&bytes);
             tuple.value_id = Some(id);
             self.index = Some(id);
@@ -116,6 +121,7 @@ impl OpIterator for SeqScan {
                 return Ok(Some(tuple));
             }
         }
+        println!("DEBUG: SeqScan.next() → end of data");
         Ok(None)
     }
 
