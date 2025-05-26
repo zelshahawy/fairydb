@@ -1,5 +1,6 @@
-use super::eviction_policy::{DummyEvictionPolicy, EvictionPolicy};
+use super::eviction_policy::EvictionPolicy;
 use super::mem_pool_trait::PageFrameId;
+use crate::buffer_pool::eviction_policy::SampledLruPolicy;
 use crate::page::Page;
 use common::ids::ContainerPageId;
 use common::rwlatch::RwLatch;
@@ -10,7 +11,7 @@ use std::{
     sync::atomic::{AtomicBool, Ordering},
 };
 
-type EvictionPolicyType = DummyEvictionPolicy;
+type EvictionPolicyType = SampledLruPolicy;
 
 /// A buffer frame is a struct that holds a page in memory.
 /// It contains metadata such as the frame id, a latch, a dirty flag to control access to the page.
