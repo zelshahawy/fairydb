@@ -38,6 +38,7 @@ history.txt
 # tpch related
 /tpch/*
 *.icloud
+e2e*
 
 
 # all csv files under benchmarks
