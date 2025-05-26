@@ -50,6 +50,22 @@ These crates are:
 
 There are two other projects outside of crustydb workspace that we will use later `e2e-benchmarks` and `e2e-tests`. These are used for end-to-end testing (eg sending SQL to the server and getting a response).
 
+## To use the application after building, you should first run the server bin and then the cli bin. 
+
+When running the CLI: I highly recommend doing the following:
+
+- \r mydb # which creates a database. You can change mydb with any name you like.
+
+- \c mydb # connects to the database you just made.
+
+- CREATE TABLE users (id INTEGER PRIMARY KEY, name VARCHAR(255)); # Creates a dummy table for your database
+
+- INSERT INTO users VALUES (1, 'alice'); # insert dummy values
+
+- SELECT * FROM users; # retrieve all values
+
+You could find a list of all commands down this file.
+
 ## Tests
 
 Most crates have tests that can be run using cargo `cargo test`. Like building you can run tests for a single crate `cargo test -p common`. Note that tests will build/compile code in the tests modules, so you may encounter build errors here that do not show up in a regular build.
@@ -256,15 +272,4 @@ We have had some mixed success with using VSCode for debugging Rust
 extensions Rust and CodeLLDB on Ubuntu has gotten debugging working on a set up.
 We included the launch.json for running tests in a package.
 
-### Alternative ways of debugging programs
 
-You are already familiar with printing the values of variables in your programs
-in order to understand program behavior and detect problems, i.e., in order to
-debug your programs. Rust has its own println!() macro (and Crusty uses a
-logging library). Rust also has a dbg!()
-macro in its standard library, which will simply format the argument so its
-printable along with the line where it's found.  A real debugger will give you
-much more information, presented better, and in context, so it's a much more
-powerful way of debugging programs, and the recommended way. However, in some
-instances, the macros above may come in handy, especially as Rust's debuggers
-support matures.
