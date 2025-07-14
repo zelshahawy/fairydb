@@ -30,25 +30,25 @@ cargo 1.82.0
 ```
 
 ## Building project
-To build the entire CrustyDB source code, you would run `cargo build`
+To build the entire fairyDB source code, you would run `cargo build`
 
-CrustyDB is set up as a workspace and various modules/components of the database are broken into separate packages/crates. To build a specific crate (for example common), you would use the following command `cargo build -p common`. Note if a package/crate depends on another crate (e.g. heapstore depends on common and txn_manager) those crates will be built as part of the process. **Note that for the first milestone you will only have access to common and limited part of heapstore.**
+fairyDB is set up as a workspace and various modules/components of the database are broken into separate packages/crates. To build a specific crate (for example common), you would use the following command `cargo build -p common`. Note if a package/crate depends on another crate (e.g. heapstore depends on common and txn_manager) those crates will be built as part of the process. **Note that for the first milestone you will only have access to common and limited part of heapstore.**
 
 
 These crates are:
-- `cli-crusty` : a command line interface client binary application that can connect and issue commands/queries to a running CrustyDB server.
-- `common` : shared data structures or logical components needed by everything in CrustyDB. this includes things like tables, errors, logical query plans, ids, some test utilities, etc. This is organized into modules that split out definitions related to the physical layout, shared query execution operations and representations, traits (interfaces), and utilities. Common metadata, structs, typedefs, enums, and errors are all located in the `base' module. 
+- `cli-fairy` : a command line interface client binary application that can connect and issue commands/queries to a running CrustyDB server.
+- `common` : shared data structures or logical components needed by everything in fairyDB. this includes things like tables, errors, logical query plans, ids, some test utilities, etc. This is organized into modules that split out definitions related to the physical layout, shared query execution operations and representations, traits (interfaces), and utilities. Common metadata, structs, typedefs, enums, and errors are all located in the `base' module. 
 - `index`:  for managing indexes. This is a work in progress and not fully implemented. 
 - `optimizer` : a crate for query optimization.
 - `queryexe` : responsible for executing queries. This contains the operator implementations as well as the execution code for a volcano style execution engine.
-- `server` : the binary crate for running a CrustyDB server. This connects all modules (outside a client) together.
+- `server` : the binary crate for running a fairyDB server. This connects all modules (outside a client) together.
 - `storage`: the storage managers for the database. This includes multiple implementations and a buffer pool. Only one storage manager can be defined/used at a time The two main storage managers used in the project are:
   - `heapstore` : a storage manager for storing data in heap files. milestone `hs` is exclusively in this crate.
   - `memstore` : a poorly written storage manager that keeps everything in memory. it will persist data to files using serde on shutdown, and use these files to recreate the database state at shutdown
 - `txn_manager` : a near empty crate for an optional milestone to implement transactions. the use a `transaction` is embedded in many other crates, but can be safely ignored for the given milestones. There is also the use of a logical timestamp throughout many components. You can safely ignore this.
 - `utilities` : utilities for performance benchmarks that will be used by an optional milestone
 
-There are two other projects outside of crustydb workspace that we will use later `e2e-benchmarks` and `e2e-tests`. These are used for end-to-end testing (eg sending SQL to the server and getting a response).
+There are two other projects outside of fairydb workspace that we will use later `e2e-benchmarks` and `e2e-tests`. These are used for end-to-end testing (eg sending SQL to the server and getting a response).
 
 ## To use the application after building, you should first run the server bin and then the cli bin. 
 
@@ -76,7 +76,7 @@ Some longer tests are set to be ignored by default. To run them: `cargo test -- 
 
 ## Logging
 
-CrustyDB uses the [env_logger](https://docs.rs/env_logger/0.8.2/env_logger/) crate for logging messages. Per the docs on the log crate:
+fairyDB uses the [env_logger](https://docs.rs/env_logger/0.8.2/env_logger/) crate for logging messages. Per the docs on the log crate:
 ```
 The basic use of the log crate is through the five logging macros: error!, warn!, info!, debug! and trace! 
 where error! represents the highest-priority log messages and trace! the lowest. 
@@ -112,14 +112,14 @@ This is the basic process for starting a database and connecting to it via the C
 2. Start a client with logging enabled to see output (this is in client.sh)
 
     ```
-    $ RUST_LOG=info cargo run --bin cli-crusty
+    $ RUST_LOG=info cargo run --bin cli-fairy
     ```
 
 For convenience we have provided some shell scripts to run the server and client. The server has a debug and info mode for the logger.
 
 ### Client Command
 
-CrustyDB emulates psql commands.
+fairyDB emulates psql commands.
 
 Command | Functionality
 ---------|--------------
@@ -142,7 +142,7 @@ The client also handles basic SQL queries.
 
 After compiling the database, start a server and a client instance.
 
-To start the crustydb server:
+To start the fairydb server:
 
 ```
 $ cargo run --bin server
@@ -151,20 +151,20 @@ $ cargo run --bin server
 and to start the client:
 
 ```
-$ cargo run --bin cli-crusty
+$ cargo run --bin cli-fairy
 ```
 
 Now, from the client, you can interact with the server. Create a database named
 'testdb':
 
 ```
-[crustydb]>> \r testdb 
+[fairydb]>> \r testdb 
 ```
 
 Then, connect to the newly created database:
 
 ```
-[crustydb]>> \c testdb
+[fairydb]>> \c testdb
 ```
 
 At this point, you can create a table 'test' in the 'testdb' database you are
@@ -172,13 +172,13 @@ connected to by writing the appropriate SQL command. Let's create a table with 2
 Integer columns, which we are going to name 'a' and 'b'.
 
 ```
-[crustydb]>> CREATE TABLE test (a INT, b INT, primary key (a));
+[fairydb]>> CREATE TABLE test (a INT, b INT, primary key (a));
 ```
 
 At this point the table exists in the database, but it does not contain any data. We include a CSV file in the repository (named 'data.csv') with some sample data you can import into the newly created table. You can do that by doing:
 
 ```
-[crustydb]>> \i <PATH>/data.csv test
+[fairydb]>> \i <PATH>/data.csv test
 ```
 
 Note that you need to replace PATH with the path to the repository where the
@@ -188,19 +188,19 @@ After importing the data, you can run basic SQL queries on the table. For
 example:
 
 ```
-[crustydb]>> SELECT a FROM test;
+[fairydb]>> SELECT a FROM test;
 ```
 
 or:
 
 ```
-[crustydb]>> SELECT sum(a), sum(b) FROM test;
+[fairydb]>> SELECT sum(a), sum(b) FROM test;
 ```
 
 As you follow through this end to end example, we encourage you to take a look
 at the log messages emitted by the server. You can search for those log messages
 in the code: that is a great way of understanding the lifecycle of query
-execution in crustydb.
+execution in fairydb.
 
 ### Client Scripts 
 
@@ -210,7 +210,7 @@ a ; after when using the cli tool). To use the script pass `-- -s [script file]`
 
 We have included a sample script that you would invoke the following way:
 ```
-cargo run -p cli-crusty -- -s test-client-script
+cargo run -p cli-fairy -- -s test-client-script
 ```
 
 ### Shutdown
@@ -221,8 +221,8 @@ or pressing Ctrl-C in the client terminal (Ctrl-D will disconnect the client but
 This allows for a clean shutdown of the server and the database.
 
 A non-clean shutdown of the server will likely leave the database in an inconsistent state.
-You will need to clean the database by removing the `crusty_data` directory
-and re-running the server (`rm -rf crusty_data/`). 
+You will need to clean the database by removing the `fairy_data` directory
+and re-running the server (`rm -rf fairy_data/`). 
 
 ## Debugging Rust Programs
 
