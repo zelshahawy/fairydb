@@ -1,4 +1,4 @@
-# CrustyDB
+# FairyDB
 FairyDB is a SQL‑compliant, high‑performance OLTP storage engine written in Rust.
 It provides a lightweight, heap‑file based storage layer with a buffer‑pool backed page allocator designed for low‑latency
 transactional workloads.
