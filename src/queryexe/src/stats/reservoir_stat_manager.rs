@@ -115,13 +115,13 @@ impl StatManagerTrait for ReservoirStatManager {
         }
     }
 
-    fn reset(&self) -> Result<(), CrustyError> {
+    fn reset(&self) -> Result<(), FairyError> {
         self.samples.write().unwrap().clear();
         self.states.write().unwrap().clear();
         Ok(())
     }
 
-    fn shutdown(&self) -> Result<(), CrustyError> {
+    fn shutdown(&self) -> Result<(), FairyError> {
         let path = self.storage_path.clone();
 
         // e2e tests lack context for parent dir to exist, so we create parent (not needed here, but just in case)
@@ -139,7 +139,7 @@ impl StatManagerTrait for ReservoirStatManager {
         Ok(())
     }
 
-    fn register_table(&self, c_id: ContainerId, schema: TableSchema) -> Result<(), CrustyError> {
+    fn register_table(&self, c_id: ContainerId, schema: TableSchema) -> Result<(), FairyError> {
         let mut samples = self.samples.write().unwrap();
         let mut states = self.states.write().unwrap();
         match samples.entry(c_id) {
@@ -152,7 +152,7 @@ impl StatManagerTrait for ReservoirStatManager {
         Ok(())
     }
 
-    fn deleted_record(&self, _value_id: &ValueId) -> Result<(), CrustyError> {
+    fn deleted_record(&self, _value_id: &ValueId) -> Result<(), FairyError> {
         todo!()
     }
 
@@ -161,14 +161,14 @@ impl StatManagerTrait for ReservoirStatManager {
         _tuple: &Tuple,
         _value_id: &ValueId,
         _old_value_id: Option<&ValueId>,
-    ) -> Result<(), CrustyError> {
+    ) -> Result<(), FairyError> {
         todo!()
     }
 
-    fn new_record(&self, tuple: &Tuple, value_id: ValueId) -> Result<(), CrustyError> {
+    fn new_record(&self, tuple: &Tuple, value_id: ValueId) -> Result<(), FairyError> {
         let mut samples = self.samples.write().unwrap();
         if !samples.contains_key(&value_id.container_id) {
-            return Err(CrustyError::CrustyError(
+            return Err(FairyError::FairyError(
                 "Container not found/registered".to_string(),
             ));
         }
@@ -184,7 +184,7 @@ impl StatManagerTrait for ReservoirStatManager {
         Ok(())
     }
 
-    fn get_container_record_count(&self, c_id: ContainerId) -> Result<usize, CrustyError> {
+    fn get_container_record_count(&self, c_id: ContainerId) -> Result<usize, FairyError> {
         let samples = self.samples.read().unwrap();
         let container_samples = samples
             .get(&c_id)
@@ -199,16 +199,16 @@ impl StatManagerTrait for ReservoirStatManager {
         &self,
         c_id: ContainerId,
         predicate: &[Expression<PhysicalRelExpr>],
-    ) -> Result<(usize, f64), CrustyError> {
+    ) -> Result<(usize, f64), FairyError> {
         let predicate = predicate
             .iter()
             .map(|p| convert_expr_to_bytecode(p.clone(), None))
-            .collect::<Result<Vec<ByteCodeExpr>, CrustyError>>()?;
+            .collect::<Result<Vec<ByteCodeExpr>, FairyError>>()?;
 
         let samples = self.samples.read().unwrap();
         let container_samples = samples
             .get(&c_id)
-            .ok_or(CrustyError::CrustyError("Container not found".to_string()))?;
+            .ok_or(FairyError::FairyError("Container not found".to_string()))?;
 
         if container_samples.samples.is_empty() {
             return Ok((0, 0.0));
@@ -234,24 +234,24 @@ impl StatManagerTrait for ReservoirStatManager {
         join_ops: &[BinaryOp],
         left_exprs: &[Expression<PhysicalRelExpr>],
         right_exprs: &[Expression<PhysicalRelExpr>],
-    ) -> Result<(usize, f64), CrustyError> {
+    ) -> Result<(usize, f64), FairyError> {
         debug_assert_eq!(join_ops.len(), left_exprs.len());
         debug_assert_eq!(join_ops.len(), right_exprs.len());
 
         let left_exprs = left_exprs
             .iter()
             .map(|p| convert_expr_to_bytecode(p.clone(), None))
-            .collect::<Result<Vec<ByteCodeExpr>, CrustyError>>()?;
+            .collect::<Result<Vec<ByteCodeExpr>, FairyError>>()?;
         let right_exprs = right_exprs
             .iter()
             .map(|p| convert_expr_to_bytecode(p.clone(), None))
-            .collect::<Result<Vec<ByteCodeExpr>, CrustyError>>()?;
+            .collect::<Result<Vec<ByteCodeExpr>, FairyError>>()?;
 
         let samples = self.samples.read().unwrap();
-        let left_container_samples = samples.get(&left_c_id).ok_or(CrustyError::CrustyError(
+        let left_container_samples = samples.get(&left_c_id).ok_or(FairyError::FairyError(
             "Container 1 not found".to_string(),
         ))?;
-        let right_container_samples = samples.get(&right_c_id).ok_or(CrustyError::CrustyError(
+        let right_container_samples = samples.get(&right_c_id).ok_or(FairyError::FairyError(
             "Container 2 not found".to_string(),
         ))?;
 
@@ -290,14 +290,14 @@ impl StatManagerTrait for ReservoirStatManager {
         &self,
         c_id: ContainerId,
         col_id: ColumnId,
-    ) -> Result<f64, CrustyError> {
+    ) -> Result<f64, FairyError> {
         let distinct_prob;
 
         {
             let samples = self.samples.read().unwrap();
             let container_samples = samples
                 .get(&c_id)
-                .ok_or(CrustyError::CrustyError("Container not found".to_string()))?;
+                .ok_or(FairyError::FairyError("Container not found".to_string()))?;
 
             if container_samples.samples.is_empty() {
                 return Ok(0.0);
@@ -374,7 +374,7 @@ mod tests {
         let err_expected = stat_manager.new_record(&tuple, ValueId::new(2));
         assert_eq!(
             err_expected,
-            Err(CrustyError::CrustyError(
+            Err(FairyError::FairyError(
                 "Container not found/registered".to_string()
             ))
         );
@@ -437,7 +437,7 @@ mod tests {
         let estimated_count_res = stat_manager.estimate_count_and_sel(2, &[predicate.clone()]);
         assert_eq!(
             estimated_count_res,
-            Err(CrustyError::CrustyError("Container not found".to_string()))
+            Err(FairyError::FairyError("Container not found".to_string()))
         );
 
         let estimated_count_res = stat_manager.estimate_count_and_sel(c_id, &[predicate.clone()]);

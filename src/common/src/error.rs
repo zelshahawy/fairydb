@@ -3,19 +3,19 @@ use std::error::Error;
 use std::fmt;
 use std::io;
 
-pub fn c_err(s: &str) -> CrustyError {
-    CrustyError::CrustyError(s.to_string())
+pub fn c_err(s: &str) -> FairyError {
+    FairyError::FairyError(s.to_string())
 }
 
 /// Custom error type.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum CrustyError {
+pub enum FairyError {
     /// IO Errors.
     IOError(String),
     /// Serialization errors.
     SerializationError(String),
     /// Custom errors.
-    CrustyError(String),
+    FairyError(String),
     /// Validation errors.
     ValidationError(String),
     /// Execution errors.
@@ -34,44 +34,43 @@ pub enum CrustyError {
     InvalidOperation,
 }
 
-impl fmt::Display for CrustyError {
+impl fmt::Display for FairyError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
             "{}",
             match self {
-                CrustyError::ValidationError(s) => format!("Validation Error: {}", s),
-                CrustyError::ExecutionError(s) => format!("Execution Error: {}", s),
-                CrustyError::CrustyError(s) => format!("Crusty Error: {}", s),
-                CrustyError::IOError(s) => s.to_string(),
-                CrustyError::SerializationError(s) => s.to_string(),
-                CrustyError::TransactionNotActive => String::from("Transaction Not Active Error"),
-                CrustyError::InvalidMutationError(s) => format!("InvalidMutationError {}", s),
-                CrustyError::TransactionRollback(tid) =>
-                    format!("Transaction Rolledback {:?}", tid),
-                CrustyError::StorageError => "Storage Error".to_string(),
-                CrustyError::ContainerDoesNotExist => "Container Does Not Exist".to_string(),
-                CrustyError::InvalidOperation => "Invalid Operation".to_string(),
+                FairyError::ValidationError(s) => format!("Validation Error: {}", s),
+                FairyError::ExecutionError(s) => format!("Execution Error: {}", s),
+                FairyError::FairyError(s) => format!("Fairy Error: {}", s),
+                FairyError::IOError(s) => s.to_string(),
+                FairyError::SerializationError(s) => s.to_string(),
+                FairyError::TransactionNotActive => String::from("Transaction Not Active Error"),
+                FairyError::InvalidMutationError(s) => format!("InvalidMutationError {}", s),
+                FairyError::TransactionRollback(tid) => format!("Transaction Rolledback {:?}", tid),
+                FairyError::StorageError => "Storage Error".to_string(),
+                FairyError::ContainerDoesNotExist => "Container Does Not Exist".to_string(),
+                FairyError::InvalidOperation => "Invalid Operation".to_string(),
             }
         )
     }
 }
 
 // Implement std::convert::From for AppError; from io::Error
-impl From<io::Error> for CrustyError {
+impl From<io::Error> for FairyError {
     fn from(error: io::Error) -> Self {
-        CrustyError::IOError(error.to_string())
+        FairyError::IOError(error.to_string())
     }
 }
 
 // Implement std::convert::From for std::sync::PoisonError
-impl<T> From<std::sync::PoisonError<T>> for CrustyError {
+impl<T> From<std::sync::PoisonError<T>> for FairyError {
     fn from(error: std::sync::PoisonError<T>) -> Self {
-        CrustyError::ExecutionError(error.to_string())
+        FairyError::ExecutionError(error.to_string())
     }
 }
 
-impl Error for CrustyError {}
+impl Error for FairyError {}
 
 /// Specify an issue when ingesting/converting a record
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

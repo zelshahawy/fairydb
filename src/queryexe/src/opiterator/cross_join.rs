@@ -1,5 +1,5 @@
 use super::OpIterator;
-use common::{CrustyError, TableSchema, Tuple};
+use common::{FairyError, TableSchema, Tuple};
 
 pub struct CrossJoin {
     // Parameters (No need to reset on close)
@@ -33,7 +33,7 @@ impl OpIterator for CrossJoin {
         self.right_child.configure(true); // right child will always be rewound by CJ
     }
 
-    fn open(&mut self) -> Result<(), CrustyError> {
+    fn open(&mut self) -> Result<(), FairyError> {
         if !self.open {
             self.left_child.open()?;
             self.right_child.open()?;
@@ -43,7 +43,7 @@ impl OpIterator for CrossJoin {
         Ok(())
     }
 
-    fn next(&mut self) -> Result<Option<Tuple>, CrustyError> {
+    fn next(&mut self) -> Result<Option<Tuple>, FairyError> {
         if !self.open {
             panic!("Iterator is not open");
         }
@@ -58,14 +58,14 @@ impl OpIterator for CrossJoin {
         Ok(None)
     }
 
-    fn close(&mut self) -> Result<(), CrustyError> {
+    fn close(&mut self) -> Result<(), FairyError> {
         self.left_child.close()?;
         self.right_child.close()?;
         self.open = false;
         Ok(())
     }
 
-    fn rewind(&mut self) -> Result<(), CrustyError> {
+    fn rewind(&mut self) -> Result<(), FairyError> {
         self.left_child.rewind()?;
         self.right_child.rewind()?;
         self.current_tuple = self.left_child.next()?;

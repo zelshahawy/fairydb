@@ -1,6 +1,6 @@
 extern crate rustyline;
 use common::error::c_err;
-use common::{CrustyError, QueryResult};
+use common::{FairyError, QueryResult};
 use log::{debug, error, info};
 use rustyline::history::FileHistory;
 
@@ -20,7 +20,7 @@ pub struct Client {
     stream: TcpStream,
 }
 
-pub fn connect_to_kill_server(config: &ClientConfig) -> Result<(), CrustyError> {
+pub fn connect_to_kill_server(config: &ClientConfig) -> Result<(), FairyError> {
     let mut bind_addr = config.host.clone();
     bind_addr.push(':');
     bind_addr.push_str(&config.port);
@@ -103,7 +103,7 @@ impl Client {
     pub fn send_requests_from_buffer<T: Read>(
         &mut self,
         mut buffer: T,
-    ) -> Result<Vec<Response>, CrustyError> {
+    ) -> Result<Vec<Response>, FairyError> {
         let mut content = String::new();
         match buffer.read_to_string(&mut content) {
             Ok(_) => {
@@ -121,7 +121,7 @@ impl Client {
         }
     }
 
-    fn handle_command(&mut self, command: String) -> Result<Response, CrustyError> {
+    fn handle_command(&mut self, command: String) -> Result<Response, FairyError> {
         match commands::parse_command(command.clone()) {
             Some(request) => {
                 debug!("Request to send {:?}", request);
@@ -144,7 +144,7 @@ impl Client {
     }
 
     /// Sends a request to the server and waits for a response.
-    fn send_and_wait(&mut self, request: &CommandWithArgs) -> Result<Response, CrustyError> {
+    fn send_and_wait(&mut self, request: &CommandWithArgs) -> Result<Response, FairyError> {
         if !self.send_request(request) {
             return Err(c_err("Failed to send request"));
         }
@@ -196,7 +196,7 @@ impl Client {
         }
     }
 
-    fn receive_response(&mut self) -> Result<Vec<u8>, CrustyError> {
+    fn receive_response(&mut self) -> Result<Vec<u8>, FairyError> {
         // Read the length of the response first
         // TODO xtx magic number again
         let mut length_bytes = [0u8; 8];

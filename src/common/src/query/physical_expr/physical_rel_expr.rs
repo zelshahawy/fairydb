@@ -15,7 +15,7 @@ use crate::{
     ids::{ColumnId, ContainerId},
     logical_expr::prelude::{Expression, JoinType},
     traits::plan::Plan,
-    AggOp, CrustyError,
+    AggOp, FairyError,
 };
 
 #[derive(Debug, Clone)]
@@ -698,7 +698,7 @@ impl PhysicalRelExpr {
         }
     }
 
-    fn set_tree_hash(&mut self, hash_val: u64) -> Result<(), CrustyError> {
+    fn set_tree_hash(&mut self, hash_val: u64) -> Result<(), FairyError> {
         match self {
             PhysicalRelExpr::Scan { tree_hash, .. }
             | PhysicalRelExpr::Select { tree_hash, .. }
@@ -719,7 +719,7 @@ impl PhysicalRelExpr {
         }
     }
 
-    pub fn get_tree_hash(&self) -> Result<u64, CrustyError> {
+    pub fn get_tree_hash(&self) -> Result<u64, FairyError> {
         match self {
             PhysicalRelExpr::Scan { tree_hash, .. }
             | PhysicalRelExpr::Select { tree_hash, .. }
@@ -745,7 +745,7 @@ impl PhysicalRelExpr {
     ///
     /// This should only ever be called once. Will throw an error if any already hashed
     /// node is getting hashed.
-    pub fn hash_plan(&mut self) -> Result<u64, CrustyError> {
+    pub fn hash_plan(&mut self) -> Result<u64, FairyError> {
         self.hash_node(None)
     }
 
@@ -761,7 +761,7 @@ impl PhysicalRelExpr {
     fn hash_node(
         &mut self,
         rename_map: Option<&mut HashMap<ColumnId, ColumnId>>,
-    ) -> Result<u64, CrustyError> {
+    ) -> Result<u64, FairyError> {
         // root_map declared to avoid going out of scope
         let mut root_map = HashMap::new();
         // rename map will be null upon intial call to function so we unwrap into an empty map if that was the case
@@ -934,7 +934,7 @@ impl PhysicalRelExpr {
 
     /// Returns level-ordered representation of a plan tree's node hashes. Will hash the
     /// tree of that hasn't been done.
-    pub fn get_hash_vec(&self) -> Result<Vec<(u64, &PhysicalRelExpr)>, CrustyError> {
+    pub fn get_hash_vec(&self) -> Result<Vec<(u64, &PhysicalRelExpr)>, FairyError> {
         // bfs traverse and populate
         let mut hashes = Vec::new();
         let mut queue = VecDeque::new();
@@ -999,7 +999,7 @@ impl PhysicalRelExpr {
     /// Looks for the given hash value within tree. We try to return the topmost we ignore renames
     /// and flag with the node right below (because that is likely what is stored) since
     /// rename(X).tree_hash = X.tree_hash.
-    fn find_hash_in_tree(&self, hash_val: u64) -> Result<Option<&PhysicalRelExpr>, CrustyError> {
+    fn find_hash_in_tree(&self, hash_val: u64) -> Result<Option<&PhysicalRelExpr>, FairyError> {
         // bfs through plan and stop when the first non-rename match is found
         let mut queue = VecDeque::new();
         queue.push_back(self);
@@ -1091,7 +1091,7 @@ impl PhysicalRelExpr {
             &'a PhysicalRelExpr,
             &'a PhysicalRelExpr,
         )>,
-        CrustyError,
+        FairyError,
     > {
         let mut overlaps = vec![];
 

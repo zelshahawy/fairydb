@@ -12,7 +12,7 @@ use common::util::data_reader::CsvReader;
 
 use common::physical_expr::physical_rel_expr::PhysicalRelExpr;
 use common::query::rules::Rules;
-use common::{CrustyError, QueryResult};
+use common::{FairyError, QueryResult};
 
 use queryexe::query::planner::physical_plan_to_op_iterator;
 use queryexe::query::translate_and_validate::{get_name, Query};
@@ -40,7 +40,7 @@ pub struct Conductor {
 }
 
 impl Conductor {
-    pub fn new(managers: &'static Managers) -> Result<Self, CrustyError> {
+    pub fn new(managers: &'static Managers) -> Result<Self, FairyError> {
         let parser = SQLParser::new();
         let optimizer = Optimizer::new(ConductorCostModel::new(managers.stats), managers);
         let executor = Executor::new_ref(managers);
@@ -57,7 +57,7 @@ impl Conductor {
     pub fn new_from_tid(
         managers: &'static Managers,
         tid: TransactionId,
-    ) -> Result<Self, CrustyError> {
+    ) -> Result<Self, FairyError> {
         let parser = SQLParser::new();
         let optimizer = Optimizer::new(ConductorCostModel::new(managers.stats), managers);
         let executor = Executor::new_ref(managers);
@@ -74,7 +74,7 @@ impl Conductor {
         &mut self,
         sql: String,
         db_state: &'static DatabaseState,
-    ) -> Result<QueryResult, CrustyError> {
+    ) -> Result<QueryResult, FairyError> {
         debug!("Parsing SQL: {:?}", &sql);
         match SQLParser::parse_sql(sql) {
             ParserResponse::SQL(ast) => self.run_sql(ast, db_state),
@@ -90,7 +90,7 @@ impl Conductor {
         &self,
         sql: &str,
         db_state: &'static DatabaseState,
-    ) -> Result<Query, CrustyError> {
+    ) -> Result<Query, FairyError> {
         match SQLParser::parse_sql(sql.to_string()) {
             ParserResponse::SQL(ast) => {
                 debug!("Processing SQL: {:?}", sql);
@@ -121,7 +121,7 @@ impl Conductor {
         &self,
         logical_plan: Query,
         db_state: &'static DatabaseState,
-    ) -> Result<PhysicalRelExpr, CrustyError> {
+    ) -> Result<PhysicalRelExpr, FairyError> {
         Ok(self
             .optimizer
             .optimize(&logical_plan, Some(&db_state.query_registrar)))
@@ -131,7 +131,7 @@ impl Conductor {
         &mut self,
         physical_plan: PhysicalRelExpr,
         db_state: &'static DatabaseState,
-    ) -> Result<QueryResult, CrustyError> {
+    ) -> Result<QueryResult, FairyError> {
         let op_iterator = physical_plan_to_op_iterator(
             db_state.managers,
             &db_state.catalog,
@@ -149,7 +149,7 @@ impl Conductor {
     pub fn run_opiterator(
         &mut self,
         op_iterator: Box<dyn queryexe::opiterator::OpIterator>,
-    ) -> Result<QueryResult, CrustyError> {
+    ) -> Result<QueryResult, FairyError> {
         // We populate the executor with the state: physical plan, and storage manager ref
         self.executor.configure_query(op_iterator);
 
@@ -161,7 +161,7 @@ impl Conductor {
         &mut self,
         ast: Vec<Statement>,
         db_state: &'static DatabaseState,
-    ) -> Result<QueryResult, CrustyError> {
+    ) -> Result<QueryResult, FairyError> {
         if ast.is_empty() {
             return Err(c_err("Empty SQL command"));
         }
@@ -256,7 +256,7 @@ impl Conductor {
         table_name: &str,
         file_path: &Path,
         db_state: &'static DatabaseState,
-    ) -> Result<QueryResult, CrustyError> {
+    ) -> Result<QueryResult, FairyError> {
         let table_id = db_state.catalog.get_table_id(table_name);
         let table_schema = db_state.catalog.get_table_schema(table_id).unwrap();
         let file = OpenOptions::new().read(true).open(file_path).unwrap();
@@ -284,7 +284,7 @@ impl Conductor {
 //         parser: SQLParser,
 //         optimizer: Optimizer,
 //         executor: Executor,
-//     ) -> Result<Self, CrustyError> {
+//     ) -> Result<Self, FairyError> {
 //         let conductor = Conductor {
 //             parser,
 //             optimizer,
@@ -306,7 +306,7 @@ impl Conductor {
 //         command: commands::Command,
 //         client_id: u64,
 //         server_state: &'static ServerState,
-//     ) -> Result<String, CrustyError> {
+//     ) -> Result<String, FairyError> {
 //         match command {
 //             commands::Command::Create(name) => {
 //                 info!("Processing COMMAND::Create {:?}", name);
@@ -346,12 +346,12 @@ impl Conductor {
 //                 let possible_cache = tokens.next();
 //                 let possible_timestamp = tokens.next();
 //                 if tokens.next().is_some() {
-//                     return Err(CrustyError::CrustyError("Too many arguments".to_string()));
+//                     return Err(FairyError::FairyError("Too many arguments".to_string()));
 //                 } else if possible_query_name.is_none()
 //                     || possible_cache.is_none()
 //                     || possible_timestamp.is_none()
 //                 {
-//                     return Err(CrustyError::CrustyError(format!(
+//                     return Err(FairyError::FairyError(format!(
 //                         "Missing arguments \"{}\"",
 //                         args
 //                     )));
@@ -359,12 +359,12 @@ impl Conductor {
 //                 let query_name = possible_query_name.unwrap();
 //                 let _cache: bool = match possible_cache.unwrap().parse() {
 //                     Ok(v) => v,
-//                     Err(e) => return Err(CrustyError::CrustyError(format!("Bad cache: {}", e))),
+//                     Err(e) => return Err(FairyError::FairyError(format!("Bad cache: {}", e))),
 //                 };
 //                 let timestamp: LogicalTimeStamp = match possible_timestamp.unwrap().parse() {
 //                     Ok(ts) => ts,
 //                     Err(e) => {
-//                         return Err(CrustyError::CrustyError(format!("Bad timestamp: {}", e)))
+//                         return Err(FairyError::FairyError(format!("Bad timestamp: {}", e)))
 //                     }
 //                 };
 //
@@ -376,7 +376,7 @@ impl Conductor {
 //                         *db_ref.get(db_id).unwrap()
 //                     }
 //                     None => {
-//                         return Err(CrustyError::CrustyError(String::from(
+//                         return Err(FairyError::FairyError(String::from(
 //                             "No active DB or DB not found",
 //                         )))
 //                     }
@@ -404,7 +404,7 @@ impl Conductor {
 //                 let sql = tokens.next();
 //
 //                 if json_file_name.is_none() || sql.is_none() {
-//                     return Err(CrustyError::CrustyError(format!(
+//                     return Err(FairyError::FairyError(format!(
 //                         "Missing arguments should be jsonfile|sql \"{}\"",
 //                         args
 //                     )));
@@ -416,7 +416,7 @@ impl Conductor {
 //                     SQLParser::parse_sql(sql.unwrap().to_string())
 //                 {
 //                     if statements.len() != 1 {
-//                         return Err(CrustyError::CrustyError(format!(
+//                         return Err(FairyError::FairyError(format!(
 //                             "Can only store single SQL statement. Got {}",
 //                             statements.len()
 //                         )));
@@ -429,7 +429,7 @@ impl Conductor {
 //                             *db_ref.get(db_id).unwrap()
 //                         }
 //                         None => {
-//                             return Err(CrustyError::CrustyError(String::from(
+//                             return Err(FairyError::FairyError(String::from(
 //                                 "No active DB or DB not found",
 //                             )))
 //                         }
@@ -454,17 +454,17 @@ impl Conductor {
 //                         match file {
 //                             Ok(mut file) => match file.write(&x) {
 //                                 Ok(_size) => Ok("ok".to_string()),
-//                                 Err(e) => Err(CrustyError::IOError(format!("{:?}", e))),
+//                                 Err(e) => Err(FairyError::IOError(format!("{:?}", e))),
 //                             },
-//                             Err(e) => Err(CrustyError::CrustyError(e.to_string())),
+//                             Err(e) => Err(FairyError::FairyError(e.to_string())),
 //                         }
 //                     } else {
-//                         Err(CrustyError::CrustyError(String::from(
+//                         Err(FairyError::FairyError(String::from(
 //                             "SQL statement is not a query.",
 //                         )))
 //                     }
 //                 } else {
-//                     Err(CrustyError::CrustyError(String::from(
+//                     Err(FairyError::FairyError(String::from(
 //                         "Can only store valid SQL statement.",
 //                     )))
 //                 }
@@ -528,9 +528,9 @@ impl Conductor {
 //                 let possible_csv_filename = tokens.next();
 //                 let possible_n = tokens.next();
 //                 if tokens.next().is_some() {
-//                     return Err(CrustyError::CrustyError("Too many arguments".to_string()));
+//                     return Err(FairyError::FairyError("Too many arguments".to_string()));
 //                 } else if possible_csv_filename.is_none() || possible_n.is_none() {
-//                     return Err(CrustyError::CrustyError(format!(
+//                     return Err(FairyError::FairyError(format!(
 //                         "Missing arguments \"{}\"",
 //                         args
 //                     )));
@@ -538,7 +538,7 @@ impl Conductor {
 //                 let csv_file_name = possible_csv_filename.unwrap();
 //                 let n: u64 = match possible_n.unwrap().parse() {
 //                     Ok(v) => v,
-//                     Err(e) => return Err(CrustyError::CrustyError(format!("Bad n: {}", e))),
+//                     Err(e) => return Err(FairyError::FairyError(format!("Bad n: {}", e))),
 //                 };
 //                 let tuples = testutil::gen_test_tuples(n);
 //                 csv_utils::write_tuples_to_new_csv(csv_file_name.to_string(), tuples)
@@ -570,7 +570,7 @@ impl Conductor {
 //         &mut self,
 //         sql: &str,
 //         db_state: &'static DatabaseState,
-//     ) -> Result<QueryResult, CrustyError> {
+//     ) -> Result<QueryResult, FairyError> {
 //         match SQLParser::parse_sql(sql.to_string()) {
 //             ParserResponse::SQL(ast) => {
 //                 info!("Processing SQL: {:?}", sql);
@@ -588,7 +588,7 @@ impl Conductor {
 //         &self,
 //         sql: &str,
 //         db_state: &'static DatabaseState,
-//     ) -> Result<LogicalPlan, CrustyError> {
+//     ) -> Result<LogicalPlan, FairyError> {
 //         match SQLParser::parse_sql(sql.to_string()) {
 //             ParserResponse::SQL(ast) => {
 //                 info!("Processing SQL: {:?}", sql);
@@ -613,7 +613,7 @@ impl Conductor {
 //         &self,
 //         logical_plan: LogicalPlan,
 //         db_state: &'static DatabaseState,
-//     ) -> Result<PhysicalPlan, CrustyError> {
+//     ) -> Result<PhysicalPlan, FairyError> {
 //         let db = &db_state.database;
 //         logical_plan_to_physical_plan(logical_plan, db)
 //     }
@@ -622,7 +622,7 @@ impl Conductor {
 //         &mut self,
 //         physical_plan: PhysicalPlan,
 //         db_state: &'static DatabaseState,
-//     ) -> Result<QueryResult, CrustyError> {
+//     ) -> Result<QueryResult, FairyError> {
 //         let db = &db_state.database;
 //         let op_iterator = physical_plan_to_op_iterator(
 //             db_state.storage_manager,
@@ -657,9 +657,9 @@ impl Conductor {
 //         &mut self,
 //         cmd: Vec<Statement>,
 //         db_state: &'static DatabaseState,
-//     ) -> Result<QueryResult, CrustyError> {
+//     ) -> Result<QueryResult, FairyError> {
 //         if cmd.is_empty() {
-//             Err(CrustyError::CrustyError(String::from("Empty SQL command")))
+//             Err(FairyError::FairyError(String::from("Empty SQL command")))
 //         } else {
 //             match cmd.first().unwrap() {
 //                 Statement::CreateTable {
@@ -698,7 +698,7 @@ impl Conductor {
 //                     );
 //                     if let SetExpr::Values(values) = &source.as_ref().body {
 //                         if !columns.is_empty() {
-//                             Err(CrustyError::CrustyError(String::from(
+//                             Err(FairyError::FairyError(String::from(
 //                                 "Inserts with columns specified are not currently supported. Must supply values for the entire table",
 //                             )))
 //                         } else {
@@ -717,7 +717,7 @@ impl Conductor {
 //                             Ok(qr)
 //                         }
 //                     } else {
-//                         Err(CrustyError::CrustyError(String::from(
+//                         Err(FairyError::FairyError(String::from(
 //                             "Inserts via query not currently supported. Must supply values",
 //                         )))
 //                     }
@@ -727,7 +727,7 @@ impl Conductor {
 //                     selection,
 //                 } => {
 //                     debug!("Deleting table:{} selection: {:?}", table_name, selection);
-//                     Err(CrustyError::CrustyError(String::from(
+//                     Err(FairyError::FairyError(String::from(
 //                         "Delete not currently supported",
 //                     )))
 //                 }
@@ -739,7 +739,7 @@ impl Conductor {
 //                         "Truncating table:{} partitions: {:?}",
 //                         table_name, partitions
 //                     );
-//                     Err(CrustyError::CrustyError(String::from(
+//                     Err(FairyError::FairyError(String::from(
 //                         "Binary truncate not currently supported",
 //                     )))
 //                 }
@@ -830,7 +830,7 @@ impl Conductor {
 //         physical_plan: Arc<PhysicalPlan>,
 //         db_state: &'static DatabaseState,
 //         timestamp: LogicalTimeStamp,
-//     ) -> Result<QueryResult, CrustyError> {
+//     ) -> Result<QueryResult, FairyError> {
 //         let db = &db_state.database;
 //
 //         // Start transaction
@@ -866,9 +866,9 @@ impl Conductor {
 //         &self,
 //         table_name: &ObjectName,
 //         db_state: &'static DatabaseState,
-//     ) -> Result<(ContainerId, String, TableSchema), CrustyError> {
+//     ) -> Result<(ContainerId, String, TableSchema), FairyError> {
 //         if table_name.0.len() != 1 {
-//             return Err(CrustyError::CrustyError(
+//             return Err(FairyError::FairyError(
 //                 "Insert statement only supports unqualified table names".to_owned(),
 //             ));
 //         }
@@ -877,7 +877,7 @@ impl Conductor {
 //             .database
 //             .get_table_id(extracted_table_name)
 //             .ok_or_else(|| {
-//                 CrustyError::CrustyError(format!(
+//                 FairyError::FairyError(format!(
 //                     "Import cannot find table id for table {}",
 //                     table_name
 //                 ))
@@ -892,7 +892,7 @@ impl Conductor {
 //         table_name: &str,
 //         client_id: u64,
 //         server_state: &'static ServerState,
-//     ) -> Result<(ContainerId, TableSchema), CrustyError> {
+//     ) -> Result<(ContainerId, TableSchema), FairyError> {
 //         let db_id_ref = server_state.active_connections.read().unwrap();
 //         let db_state = match db_id_ref.get(&client_id) {
 //             Some(db_id) => {
@@ -900,14 +900,14 @@ impl Conductor {
 //                 *db_ref.get(db_id).unwrap()
 //             }
 //             None => {
-//                 return Err(CrustyError::CrustyError(String::from(
+//                 return Err(FairyError::FairyError(String::from(
 //                     "No active DB or DB not found",
 //                 )))
 //             }
 //         };
 //
 //         let table_id = db_state.database.get_table_id(table_name).ok_or_else(|| {
-//             CrustyError::CrustyError(format!(
+//             FairyError::FairyError(format!(
 //                 "Import cannot find table id for table {}",
 //                 table_name
 //             ))

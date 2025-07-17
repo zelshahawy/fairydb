@@ -19,7 +19,7 @@ pub struct ServerConfig {
     #[clap(
         short = 'd',
         long = "server_path",
-        default_value = "crusty_data/persist/default/"
+        default_value = "fairy_data/persist/default/"
     )]
     pub db_path: PathBuf,
     /// Log file
@@ -44,7 +44,7 @@ impl Default for ServerConfig {
         ServerConfig {
             host: "127.0.0.1".to_owned(),
             port: "3333".to_owned(),
-            db_path: "crusty_data/persist/default/".into(),
+            db_path: "fairy_data/persist/default/".into(),
             log_file: "".to_owned(),
             log_level: "warning".to_owned(),
             subsumption_detection: false,
@@ -203,10 +203,7 @@ mod tests {
         let config = ServerConfig::default();
         assert_eq!(config.host, "127.0.0.1");
         assert_eq!(config.port, "3333");
-        assert_eq!(
-            config.db_path,
-            PathBuf::from("crusty_data/persist/default/")
-        );
+        assert_eq!(config.db_path, PathBuf::from("fairy_data/persist/default/"));
         assert_eq!(config.log_file, "");
         assert_eq!(config.log_level, "warning");
         assert!(!config.subsumption_detection);
@@ -235,10 +232,7 @@ mod tests {
         let config = result.unwrap();
         assert_eq!(config.host, "0.0.0.0");
         assert_eq!(config.port, "9999");
-        assert_eq!(
-            config.db_path,
-            PathBuf::from("crusty_data/persist/default/")
-        );
+        assert_eq!(config.db_path, PathBuf::from("fairy_data/persist/default/"));
         assert_eq!(config.log_file, "");
         assert_eq!(config.log_level, "warning");
         assert!(!config.subsumption_detection);
@@ -295,10 +289,7 @@ mod tests {
         // Test that the config values are correct
         assert_eq!(config.host, "0.0.0.0");
         assert_eq!(config.port, "3333");
-        assert_eq!(
-            config.db_path,
-            PathBuf::from("crusty_data/persist/default/")
-        );
+        assert_eq!(config.db_path, PathBuf::from("fairy_data/persist/default/"));
         assert_eq!(config.log_file, "");
         assert_eq!(config.log_level, "warning");
         assert!(!config.subsumption_detection);

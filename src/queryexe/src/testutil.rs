@@ -10,12 +10,12 @@ use common::prelude::TransactionId;
 use common::table::TableInfo;
 use common::traits::stat_manager_trait::StatManagerTrait;
 use common::traits::storage_trait::StorageTrait;
-use common::CrustyError;
+use common::FairyError;
 use common::Field;
 use common::{Attribute, DataType, TableSchema, Tuple};
 use index::IndexManager;
 
-pub fn execute_iter(iter: &mut dyn OpIterator, sorted: bool) -> Result<Vec<Tuple>, CrustyError> {
+pub fn execute_iter(iter: &mut dyn OpIterator, sorted: bool) -> Result<Vec<Tuple>, FairyError> {
     let mut tuples = Vec::new();
     iter.open()?;
     while let Some(tuple) = iter.next()? {

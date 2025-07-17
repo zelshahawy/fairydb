@@ -1,4 +1,4 @@
-use crate::{tuple::Tuple, CrustyError, Field};
+use crate::{tuple::Tuple, FairyError, Field};
 use std::ops::{Add, Div, Mul, Sub};
 
 pub trait FromBool {
@@ -153,7 +153,7 @@ fn push_lit<T>(
 
 fn add<T>(_bytecodes: &[usize], _i: &mut usize, stack: &mut Vec<T>, _literals: &[T], _record: &[T])
 where
-    T: Add<Output = Result<T, CrustyError>> + Clone,
+    T: Add<Output = Result<T, FairyError>> + Clone,
 {
     let r = stack.pop().unwrap();
     let l = stack.pop().unwrap();
@@ -162,7 +162,7 @@ where
 
 fn sub<T>(_bytecodes: &[usize], _i: &mut usize, stack: &mut Vec<T>, _literals: &[T], _record: &[T])
 where
-    T: Sub<Output = Result<T, CrustyError>> + Clone,
+    T: Sub<Output = Result<T, FairyError>> + Clone,
 {
     let r = stack.pop().unwrap();
     let l = stack.pop().unwrap();
@@ -171,7 +171,7 @@ where
 
 fn mul<T>(_bytecodes: &[usize], _i: &mut usize, stack: &mut Vec<T>, _literals: &[T], _record: &[T])
 where
-    T: Mul<Output = Result<T, CrustyError>> + Clone,
+    T: Mul<Output = Result<T, FairyError>> + Clone,
 {
     let r = stack.pop().unwrap();
     let l = stack.pop().unwrap();
@@ -180,7 +180,7 @@ where
 
 fn div<T>(_bytecodes: &[usize], _i: &mut usize, stack: &mut Vec<T>, _literals: &[T], _record: &[T])
 where
-    T: Div<Output = Result<T, CrustyError>> + Clone,
+    T: Div<Output = Result<T, FairyError>> + Clone,
 {
     let r = stack.pop().unwrap();
     let l = stack.pop().unwrap();

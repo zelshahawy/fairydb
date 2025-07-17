@@ -116,7 +116,7 @@ impl StorageTrait for StorageManager {
     }
 
     /// Remove the value from the container
-    fn delete_value(&self, id: ValueId, _tid: TransactionId) -> Result<(), CrustyError> {
+    fn delete_value(&self, id: ValueId, _tid: TransactionId) -> Result<(), FairyError> {
         let containers = self.containers.write().unwrap();
         if containers.contains_key(&id.container_id) {
             let mut table_map = containers.get(&id.container_id).unwrap().write().unwrap();
@@ -128,7 +128,7 @@ impl StorageTrait for StorageManager {
                 Ok(())
             }
         } else {
-            Err(CrustyError::CrustyError(String::from(
+            Err(FairyError::FairyError(String::from(
                 "File ID not found for recordID",
             )))
         }
@@ -140,7 +140,7 @@ impl StorageTrait for StorageManager {
         value: Vec<u8>,
         id: ValueId,
         _tid: TransactionId,
-    ) -> Result<ValueId, CrustyError> {
+    ) -> Result<ValueId, FairyError> {
         self.delete_value(id, _tid)?;
         Ok(self.insert_value(id.container_id, value, _tid))
     }
@@ -152,13 +152,13 @@ impl StorageTrait for StorageManager {
         name: Option<String>,
         _container_type: StateType,
         dependencies: Option<Vec<ContainerId>>,
-    ) -> Result<(), CrustyError> {
+    ) -> Result<(), FairyError> {
         if let Some(c_name) = name {
             let mut map = self.container_names.write().unwrap();
             if let std::collections::hash_map::Entry::Vacant(e) = map.entry(c_name) {
                 e.insert(container_id);
             } else {
-                return Err(CrustyError::ExecutionError(String::from(
+                return Err(FairyError::ExecutionError(String::from(
                     "Container with name already exists",
                 )));
             }
@@ -184,13 +184,13 @@ impl StorageTrait for StorageManager {
         Ok(())
     }
 
-    fn create_table(&self, container_id: ContainerId) -> Result<(), CrustyError> {
+    fn create_table(&self, container_id: ContainerId) -> Result<(), FairyError> {
         self.create_container(container_id, None, StateType::BaseTable, None)
     }
 
     /// Remove the container and all stored values in the container.
     /// If the container is persisted remove the underlying files
-    fn remove_container(&self, container_id: ContainerId) -> Result<(), CrustyError> {
+    fn remove_container(&self, container_id: ContainerId) -> Result<(), FairyError> {
         let mut containers = self.containers.write().unwrap();
         if !containers.contains_key(&container_id) {
             debug!(
@@ -247,27 +247,27 @@ impl StorageTrait for StorageManager {
         id: ValueId,
         _tid: TransactionId,
         _perm: Permissions,
-    ) -> Result<Vec<u8>, CrustyError> {
+    ) -> Result<Vec<u8>, FairyError> {
         let containers = self.containers.read().unwrap();
         if containers.contains_key(&id.container_id) {
             let map = containers.get(&id.container_id).unwrap().read().unwrap();
             if map.contains_key(&id) {
                 Ok(map.get(&id).unwrap().clone())
             } else {
-                Err(CrustyError::ExecutionError(format!(
+                Err(FairyError::ExecutionError(format!(
                     "Record ID not found {:?}",
                     id
                 )))
             }
         } else {
-            Err(CrustyError::ExecutionError(format!(
+            Err(FairyError::ExecutionError(format!(
                 "File ID not found {:?}",
                 id
             )))
         }
     }
 
-    fn reset(&self) -> Result<(), CrustyError> {
+    fn reset(&self) -> Result<(), FairyError> {
         let mut containers = self.containers.write().unwrap();
         let mut last_inserts = self.last_insert.write().unwrap();
         let mut container_names = self.container_names.write().unwrap();

@@ -5,7 +5,7 @@ use std::sync::{Arc, RwLock};
 use crate::ids::{ContainerId, LogicalTimeStamp, TransactionId};
 use crate::physical_expr::physical_rel_expr::PhysicalRelExpr;
 use crate::traits::transaction_manager_trait::TransactionManagerTrait;
-use crate::CrustyError;
+use crate::FairyError;
 
 pub struct QueryStateRegistrar {
     // maps query name to tuple: (query plan hash, plan)
@@ -43,10 +43,10 @@ impl QueryStateRegistrar {
         }
     }
 
-    pub fn reset(&self) -> Result<(), CrustyError> {
+    pub fn reset(&self) -> Result<(), FairyError> {
         let mut in_prog = self.in_progress_queries.write().unwrap();
         if !in_prog.is_empty() {
-            Err(CrustyError::CrustyError(String::from(
+            Err(FairyError::FairyError(String::from(
                 "Queries are in progress cannot drop/reset",
             )))
         } else {
@@ -82,7 +82,7 @@ impl QueryStateRegistrar {
         query_name: String,
         json_path: String,
         query_plan: Arc<PhysicalRelExpr>,
-    ) -> Result<(), CrustyError> {
+    ) -> Result<(), FairyError> {
         self.query_plans
             .write()
             .unwrap()
@@ -110,7 +110,7 @@ impl QueryStateRegistrar {
         query_plan: Arc<PhysicalRelExpr>,
         query_result_path: String,
         query_tid: TransactionId,
-    ) -> Result<(), CrustyError> {
+    ) -> Result<(), FairyError> {
         self.query_plans
             .write()
             .unwrap()
@@ -150,7 +150,7 @@ impl QueryStateRegistrar {
         start_timestamp: Option<LogicalTimeStamp>,
         end_timestamp: LogicalTimeStamp,
         txn_manager: &dyn TransactionManagerTrait,
-    ) -> Result<Arc<PhysicalRelExpr>, CrustyError> {
+    ) -> Result<Arc<PhysicalRelExpr>, FairyError> {
         assert!(start_timestamp.unwrap_or(0) <= end_timestamp);
 
         // Checks transaction not in progress
@@ -160,7 +160,7 @@ impl QueryStateRegistrar {
             .unwrap()
             .contains_key(query_name)
         {
-            return Err(CrustyError::CrustyError(format!(
+            return Err(FairyError::FairyError(format!(
                 "Query \"{}\" already in progress.",
                 query_name
             )));
@@ -186,7 +186,7 @@ impl QueryStateRegistrar {
                     .insert(query_name.to_string(), end_timestamp);
                 Ok(Arc::clone(physical_plan))
             }
-            None => Err(CrustyError::CrustyError(format!(
+            None => Err(FairyError::FairyError(format!(
                 "Query \"{}\" has not been registered.",
                 query_name
             ))),
@@ -198,14 +198,14 @@ impl QueryStateRegistrar {
     /// # Arguments
     ///
     /// * `query_name` - Query finished.
-    pub fn finish_query(&self, query_name: &str) -> Result<(), CrustyError> {
+    pub fn finish_query(&self, query_name: &str) -> Result<(), FairyError> {
         if !self
             .in_progress_queries
             .read()
             .unwrap()
             .contains_key(query_name)
         {
-            Err(CrustyError::CrustyError(format!(
+            Err(FairyError::FairyError(format!(
                 "Query \"{}\" is not in progress.",
                 query_name
             )))
@@ -228,7 +228,7 @@ impl QueryStateRegistrar {
         }
     }
 
-    pub fn get_registered_query_names(&self) -> Result<String, CrustyError> {
+    pub fn get_registered_query_names(&self) -> Result<String, FairyError> {
         let mut registered_query_names_and_paths = Vec::new();
         for (query_name, json_path) in self.query_filenames.read().unwrap().iter() {
             registered_query_names_and_paths
@@ -242,7 +242,7 @@ impl QueryStateRegistrar {
         }
     }
 
-    pub fn purge_query_with_name(&self, query_name: &String) -> Result<(), CrustyError> {
+    pub fn purge_query_with_name(&self, query_name: &String) -> Result<(), FairyError> {
         self.query_plans.write().unwrap().remove(query_name);
         self.query_filenames.write().unwrap().remove(query_name);
         self.query_watermarks.write().unwrap().remove(query_name);
@@ -270,7 +270,7 @@ impl QueryStateRegistrar {
         Ok(())
     }
 
-    pub fn get_query_name_from_sql(&self, sql: &String) -> Result<Option<String>, CrustyError> {
+    pub fn get_query_name_from_sql(&self, sql: &String) -> Result<Option<String>, FairyError> {
         let sql_to_name_map = self.sql_to_query_name.read().unwrap();
         let name = sql_to_name_map.get(sql);
         match name {
@@ -282,7 +282,7 @@ impl QueryStateRegistrar {
     pub fn get_query_result_path_from_name(
         &self,
         query_name: &String,
-    ) -> Result<Option<String>, CrustyError> {
+    ) -> Result<Option<String>, FairyError> {
         let filenames = self.query_result_filenames.read().unwrap();
         let name = filenames.get(query_name);
         match name {
@@ -295,7 +295,7 @@ impl QueryStateRegistrar {
     pub fn get_touched_tables_from_name(
         &self,
         query_name: &String,
-    ) -> Result<Option<Vec<ContainerId>>, CrustyError> {
+    ) -> Result<Option<Vec<ContainerId>>, FairyError> {
         let physical_plans = self.query_plans.read().unwrap();
         match physical_plans.get(query_name) {
             Some(pp) => {
@@ -310,7 +310,7 @@ impl QueryStateRegistrar {
     pub fn get_query_tid_from_name(
         &self,
         query_name: &String,
-    ) -> Result<Option<TransactionId>, CrustyError> {
+    ) -> Result<Option<TransactionId>, FairyError> {
         let tids = self.query_tids.read().unwrap();
         let tid = tids.get(query_name);
         match tid {

@@ -44,12 +44,12 @@ impl OpIterator for Update {
         unimplemented!()
     }
 
-    fn open(&mut self) -> Result<(), CrustyError> {
+    fn open(&mut self) -> Result<(), FairyError> {
         self.open = true;
         self.child.open()
     }
 
-    fn next(&mut self) -> Result<Option<Tuple>, CrustyError> {
+    fn next(&mut self) -> Result<Option<Tuple>, FairyError> {
         if !self.open {
             panic!("Operator has not been opened")
         }
@@ -58,7 +58,7 @@ impl OpIterator for Update {
             let id = match tuple.value_id {
                 Some(id) => id,
                 None => {
-                    return Err(CrustyError::CrustyError(
+                    return Err(FairyError::FairyError(
                         "No value id set for record. Cannot update".to_string(),
                     ));
                 }
@@ -110,13 +110,13 @@ impl OpIterator for Update {
         Ok(next)
     }
 
-    fn close(&mut self) -> Result<(), CrustyError> {
+    fn close(&mut self) -> Result<(), FairyError> {
         self.child.close()?;
         self.open = false;
         Ok(())
     }
 
-    fn rewind(&mut self) -> Result<(), CrustyError> {
+    fn rewind(&mut self) -> Result<(), FairyError> {
         unimplemented!();
     }
 

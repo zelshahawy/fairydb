@@ -36,9 +36,9 @@ fairyDB is set up as a workspace and various modules/components of the database 
 
 
 These crates are:
-- `cli-fairy` : a command line interface client binary application that can connect and issue commands/queries to a running CrustyDB server.
-- `common` : shared data structures or logical components needed by everything in fairyDB. this includes things like tables, errors, logical query plans, ids, some test utilities, etc. This is organized into modules that split out definitions related to the physical layout, shared query execution operations and representations, traits (interfaces), and utilities. Common metadata, structs, typedefs, enums, and errors are all located in the `base' module. 
-- `index`:  for managing indexes. This is a work in progress and not fully implemented. 
+- `cli-fairy` : a command line interface client binary application that can connect and issue commands/queries to a running FairyDB server.
+- `common` : shared data structures or logical components needed by everything in FairyDB. this includes things like tables, errors, logical query plans, ids, some test utilities, etc. This is organized into modules that split out definitions related to the physical layout, shared query execution operations and representations, traits (interfaces), and utilities. Common metadata, structs, typedefs, enums, and errors are all located in the `base' module.
+- `index`:  for managing indexes. This is a work in progress and not fully implemented.
 - `optimizer` : a crate for query optimization.
 - `queryexe` : responsible for executing queries. This contains the operator implementations as well as the execution code for a volcano style execution engine.
 - `server` : the binary crate for running a fairyDB server. This connects all modules (outside a client) together.
@@ -50,7 +50,7 @@ These crates are:
 
 There are two other projects outside of fairydb workspace that we will use later `e2e-benchmarks` and `e2e-tests`. These are used for end-to-end testing (eg sending SQL to the server and getting a response).
 
-## To use the application after building, you should first run the server bin and then the cli bin. 
+## To use the application after building, you should first run the server bin and then the cli bin.
 
 When running the CLI: I highly recommend doing the following:
 
@@ -78,9 +78,9 @@ Some longer tests are set to be ignored by default. To run them: `cargo test -- 
 
 fairyDB uses the [env_logger](https://docs.rs/env_logger/0.8.2/env_logger/) crate for logging messages. Per the docs on the log crate:
 ```
-The basic use of the log crate is through the five logging macros: error!, warn!, info!, debug! and trace! 
-where error! represents the highest-priority log messages and trace! the lowest. 
-The log messages are filtered by configuring the log level to exclude messages with a lower priority. 
+The basic use of the log crate is through the five logging macros: error!, warn!, info!, debug! and trace!
+where error! represents the highest-priority log messages and trace! the lowest.
+The log messages are filtered by configuring the log level to exclude messages with a lower priority.
 Each of these macros accept format strings similarly to println!.
 ```
 
@@ -125,7 +125,7 @@ Command | Functionality
 ---------|--------------
 `\r [DATABABSE]` | cReates a new database, DATABASE
 `\c [DATABASE]` | Connects to DATABASE
-`\i [PATH] [TABLE_NAME]` | Imports a csv file at PATH and saves it to TABLE_NAME in 
+`\i [PATH] [TABLE_NAME]` | Imports a csv file at PATH and saves it to TABLE_NAME in
 whatever database the client is currently connected to.
 `\l` | List the name of all databases present on the server.
 `\dt` | List the name of all tables present on the current database.
@@ -158,7 +158,7 @@ Now, from the client, you can interact with the server. Create a database named
 'testdb':
 
 ```
-[fairydb]>> \r testdb 
+[fairydb]>> \r testdb
 ```
 
 Then, connect to the newly created database:
@@ -202,11 +202,11 @@ at the log messages emitted by the server. You can search for those log messages
 in the code: that is a great way of understanding the lifecycle of query
 execution in fairydb.
 
-### Client Scripts 
+### Client Scripts
 
-The client has an option of running a series of commands/queries from a text file. 
-Each command or query must be separated by a ; (even commands that would not give 
-a ; after when using the cli tool). To use the script pass `-- -s [script file]` 
+The client has an option of running a series of commands/queries from a text file.
+Each command or query must be separated by a ; (even commands that would not give
+a ; after when using the cli tool). To use the script pass `-- -s [script file]`
 
 We have included a sample script that you would invoke the following way:
 ```
@@ -222,7 +222,7 @@ This allows for a clean shutdown of the server and the database.
 
 A non-clean shutdown of the server will likely leave the database in an inconsistent state.
 You will need to clean the database by removing the `fairy_data` directory
-and re-running the server (`rm -rf fairy_data/`). 
+and re-running the server (`rm -rf fairy_data/`).
 
 ## Debugging Rust Programs
 
@@ -238,5 +238,5 @@ However CLion is not free, but it does offer academic licenses. [Apply here](htt
 if you want to access the tool (some restrictions on what you can use the tool for).
 [Here are instructions on set up and using](https://blog.jetbrains.com/clion/2019/10/debugging-rust-code-in-clion/)
 which worked for me out of the box on Ubuntu (with installing the Rust plugin).
-One of our TAs uses CLion to debug Rust on OSX. The link also contains instructions for 
+One of our TAs uses CLion to debug Rust on OSX. The link also contains instructions for
 debugging on Windows, but it has not been tested by us.

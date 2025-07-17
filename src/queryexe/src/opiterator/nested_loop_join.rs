@@ -3,7 +3,7 @@ use super::OpIterator;
 #[allow(unused_imports)]
 use common::datatypes::compare_fields; // QO compare fields with op
 use common::query::bytecode_expr::ByteCodeExpr;
-use common::{BinaryOp, CrustyError, TableSchema, Tuple};
+use common::{BinaryOp, FairyError, TableSchema, Tuple};
 
 /// Nested loop join implementation. (You can add any other fields that you think are neccessary)
 pub struct NestedLoopJoin {
@@ -57,7 +57,7 @@ impl OpIterator for NestedLoopJoin {
         self.right_child.configure(true); // right child will always be rewound by NLJ
     }
 
-    fn open(&mut self) -> Result<(), CrustyError> {
+    fn open(&mut self) -> Result<(), FairyError> {
         if !self.open {
             self.left_child.open()?;
             self.right_child.open()?;
@@ -69,7 +69,7 @@ impl OpIterator for NestedLoopJoin {
 
     /// Calculates the next tuple for a nested loop join.
     /// hint look at `compare_fields` and `Tuple.merge` functions
-    fn next(&mut self) -> Result<Option<Tuple>, CrustyError> {
+    fn next(&mut self) -> Result<Option<Tuple>, FairyError> {
         if !self.open {
             panic!("Operator has not been opened")
         }
@@ -96,7 +96,7 @@ impl OpIterator for NestedLoopJoin {
         Ok(None)
     }
 
-    fn close(&mut self) -> Result<(), CrustyError> {
+    fn close(&mut self) -> Result<(), FairyError> {
         if self.open {
             self.left_child.close()?;
             self.right_child.close()?;
@@ -106,7 +106,7 @@ impl OpIterator for NestedLoopJoin {
         Ok(())
     }
 
-    fn rewind(&mut self) -> Result<(), CrustyError> {
+    fn rewind(&mut self) -> Result<(), FairyError> {
         if !self.open {
             panic!("Operator has not been opened")
         }

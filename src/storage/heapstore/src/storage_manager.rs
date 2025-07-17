@@ -24,12 +24,12 @@ pub struct StorageManager {
 /// The required functions in HeapStore's StorageManager that are specific for HeapFiles
 impl StorageManager {
     /// Get the heapfile for a given container id
-    fn get_heapfile(&self, c_id: ContainerId) -> Result<Arc<HF>, CrustyError> {
+    fn get_heapfile(&self, c_id: ContainerId) -> Result<Arc<HF>, FairyError> {
         let files = self.cid_heapfile_map.read().unwrap();
         if let Some(hf) = files.get(&c_id) {
             Ok(hf.clone())
         } else {
-            Err(CrustyError::StorageError)
+            Err(FairyError::StorageError)
         }
     }
 
@@ -118,20 +118,20 @@ impl StorageTrait for StorageManager {
     }
 
     /// Delete the data for a value. If the valueID is not found it returns Ok() still.
-    fn delete_value(&self, id: ValueId, _tid: TransactionId) -> Result<(), CrustyError> {
+    fn delete_value(&self, id: ValueId, _tid: TransactionId) -> Result<(), FairyError> {
         let hf = self.get_heapfile(id.container_id)?;
         // Missing page_id or slot_id is “not found”
-        let pid = id.page_id.ok_or(CrustyError::StorageError)?;
-        let slot = id.slot_id.ok_or(CrustyError::StorageError)?;
+        let pid = id.page_id.ok_or(FairyError::StorageError)?;
+        let slot = id.slot_id.ok_or(FairyError::StorageError)?;
         // If the page doesn’t even exist, that’s an error (test_not_found)
         let num_pages = hf.num_pages();
         if pid >= num_pages {
-            return Err(CrustyError::StorageError);
+            return Err(FairyError::StorageError);
         }
         // just ok lil bro
         match hf.delete_val(pid, slot) {
             Ok(()) => Ok(()),
-            Err(CrustyError::StorageError) => Ok(()),
+            Err(FairyError::StorageError) => Ok(()),
             Err(e) => Err(e),
         }
     }
@@ -144,10 +144,10 @@ impl StorageTrait for StorageManager {
         value: Vec<u8>,
         id: ValueId,
         _tid: TransactionId,
-    ) -> Result<ValueId, CrustyError> {
+    ) -> Result<ValueId, FairyError> {
         let hf = self.get_heapfile(id.container_id)?;
-        let pid = id.page_id.ok_or(CrustyError::StorageError)?;
-        let slot_id = id.slot_id.ok_or(CrustyError::StorageError)?;
+        let pid = id.page_id.ok_or(FairyError::StorageError)?;
+        let slot_id = id.slot_id.ok_or(FairyError::StorageError)?;
         let val_id = hf.update_val(pid, slot_id, &value)?;
         Ok(val_id)
     }
@@ -168,14 +168,14 @@ impl StorageTrait for StorageManager {
         _name: Option<String>,                   // Not used in this milestone
         _container_type: common::ids::StateType, // Not used in this milestone
         _dependencies: Option<Vec<ContainerId>>, // Not used in this milestone
-    ) -> Result<(), CrustyError> {
+    ) -> Result<(), FairyError> {
         // If the container already exists, return an error.
         // Otherwise create a new container and add it to the map.
         // Call create_container in the buffer pool to create the container there.
         // Initialize the container as a heapfile amd add to the cid_heapfile_map
         let mut files = self.cid_heapfile_map.write().unwrap();
         if files.contains_key(&container_id) {
-            return Err(CrustyError::StorageError);
+            return Err(FairyError::StorageError);
         }
         let hf = Arc::new(HeapFile::new(container_id, self.bp.clone()).unwrap());
         files.insert(container_id, hf);
@@ -183,13 +183,13 @@ impl StorageTrait for StorageManager {
     }
 
     /// A wrapper function to call create container
-    fn create_table(&self, container_id: ContainerId) -> Result<(), CrustyError> {
+    fn create_table(&self, container_id: ContainerId) -> Result<(), FairyError> {
         self.create_container(container_id, None, common::ids::StateType::BaseTable, None)
     }
 
     /// Remove the container and all stored values in the container.
     /// If the container is persisted remove the underlying files
-    fn remove_container(&self, container_id: ContainerId) -> Result<(), CrustyError> {
+    fn remove_container(&self, container_id: ContainerId) -> Result<(), FairyError> {
         panic!("Not implemented {container_id}. not needed for hs");
         //Ok(())
     }
@@ -224,9 +224,9 @@ impl StorageTrait for StorageManager {
         id: ValueId,
         _tid: TransactionId,
         _perm: Permissions,
-    ) -> Result<Vec<u8>, CrustyError> {
-        let pid = id.page_id.ok_or(CrustyError::StorageError)?;
-        let slot_id = id.slot_id.ok_or(CrustyError::StorageError)?;
+    ) -> Result<Vec<u8>, FairyError> {
+        let pid = id.page_id.ok_or(FairyError::StorageError)?;
+        let slot_id = id.slot_id.ok_or(FairyError::StorageError)?;
         let hf = self.get_heapfile(id.container_id)?;
         let val = hf.get_val(pid, slot_id)?;
         Ok(val)
@@ -237,7 +237,7 @@ impl StorageTrait for StorageManager {
     /// disk as its just meant to clear state.
     ///
     /// Clear any data structures in the SM you add
-    fn reset(&self) -> Result<(), CrustyError> {
+    fn reset(&self) -> Result<(), FairyError> {
         // Reset from the upper layer
         // 1. Deallocate the heapfile objects
         let mut files = self.cid_heapfile_map.write().unwrap();

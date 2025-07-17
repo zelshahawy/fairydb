@@ -1,7 +1,7 @@
 use crate::attribute::Attribute;
 
 #[allow(unused_imports)]
-use crate::error::{c_err, CrustyError};
+use crate::error::{c_err, FairyError};
 use crate::query::bytecode_expr::{And, FromBool, Or};
 use crate::BinaryOp;
 use chrono::{Duration, NaiveDate};
@@ -152,7 +152,7 @@ impl Or for Field {
 }
 
 impl Add for Field {
-    type Output = Result<Self, CrustyError>;
+    type Output = Result<Self, FairyError>;
 
     fn add(self, other: Self) -> Self::Output {
         match (self, other) {
@@ -178,7 +178,7 @@ impl Add for Field {
 }
 
 impl Sub for Field {
-    type Output = Result<Self, CrustyError>;
+    type Output = Result<Self, FairyError>;
 
     fn sub(self, other: Self) -> Self::Output {
         match (self, other) {
@@ -204,7 +204,7 @@ impl Sub for Field {
 }
 
 impl Mul for Field {
-    type Output = Result<Self, CrustyError>;
+    type Output = Result<Self, FairyError>;
 
     fn mul(self, other: Self) -> Self::Output {
         match (self, other) {
@@ -241,7 +241,7 @@ impl Mul for Field {
 }
 
 impl Div for Field {
-    type Output = Result<Self, CrustyError>;
+    type Output = Result<Self, FairyError>;
 
     fn div(self, other: Self) -> Self::Output {
         match (self, other) {
@@ -351,53 +351,53 @@ impl Field {
         }
     }
 
-    pub fn from_bytes(bytes: &[u8], dtype: &DataType) -> Result<Self, CrustyError> {
+    pub fn from_bytes(bytes: &[u8], dtype: &DataType) -> Result<Self, FairyError> {
         match dtype {
             DataType::BigInt => {
                 let value = i64::from_le_bytes(bytes.try_into().map_err(|_| {
-                    CrustyError::CrustyError("Failed to convert bytes to i64.".to_string())
+                    FairyError::FairyError("Failed to convert bytes to i64.".to_string())
                 })?);
                 Ok(Field::BigInt(value))
             }
             DataType::Int => {
                 let value = i32::from_le_bytes(bytes.try_into().map_err(|_| {
-                    CrustyError::CrustyError("Failed to convert bytes to i32.".to_string())
+                    FairyError::FairyError("Failed to convert bytes to i32.".to_string())
                 })?);
                 Ok(Field::Int(value))
             }
             DataType::SmallInt => {
                 let value = i16::from_le_bytes(bytes.try_into().map_err(|_| {
-                    CrustyError::CrustyError("Failed to convert bytes to i16.".to_string())
+                    FairyError::FairyError("Failed to convert bytes to i16.".to_string())
                 })?);
                 Ok(Field::SmallInt(value))
             }
             DataType::Char(i) => {
                 let value = String::from_utf8(bytes[0..*i as usize].to_vec()).map_err(|_| {
-                    CrustyError::CrustyError("Failed to convert bytes to string.".to_string())
+                    FairyError::FairyError("Failed to convert bytes to string.".to_string())
                 })?;
                 Ok(Field::Char(*i, value))
             }
             DataType::String => {
                 let s_len = u32::from_le_bytes(bytes[0..4].try_into().map_err(|_| {
-                    CrustyError::CrustyError("Failed to get string length.".to_string())
+                    FairyError::FairyError("Failed to get string length.".to_string())
                 })?) as usize;
                 let value = String::from_utf8(bytes[4..4 + s_len].to_vec()).map_err(|_| {
-                    CrustyError::CrustyError("Failed to convert bytes to string.".to_string())
+                    FairyError::FairyError("Failed to convert bytes to string.".to_string())
                 })?;
                 Ok(Field::String(value))
             }
             DataType::Date => {
                 let value = i64::from_le_bytes(bytes.try_into().map_err(|_| {
-                    CrustyError::CrustyError("Failed to convert bytes to u32.".to_string())
+                    FairyError::FairyError("Failed to convert bytes to u32.".to_string())
                 })?);
                 Ok(Field::Date(value))
             }
             DataType::Decimal(_, _) => {
                 let whole = i64::from_le_bytes(bytes[0..8].try_into().map_err(|_| {
-                    CrustyError::CrustyError("Failed to convert bytes to i64.".to_string())
+                    FairyError::FairyError("Failed to convert bytes to i64.".to_string())
                 })?);
                 let scale = u32::from_le_bytes(bytes[8..12].try_into().map_err(|_| {
-                    CrustyError::CrustyError("Failed to convert bytes to u32.".to_string())
+                    FairyError::FairyError("Failed to convert bytes to u32.".to_string())
                 })?);
                 Ok(Field::Decimal(whole, scale))
             }
@@ -409,7 +409,7 @@ impl Field {
                 if bytes[0] == 0 {
                     Ok(Field::Null)
                 } else {
-                    Err(CrustyError::CrustyError("Invalid null field".to_string()))
+                    Err(FairyError::FairyError("Invalid null field".to_string()))
                 }
             }
         }
@@ -436,7 +436,7 @@ impl Field {
         }
     }
 
-    pub fn from_str(field: &str, attr: &Attribute) -> Result<Self, CrustyError> {
+    pub fn from_str(field: &str, attr: &Attribute) -> Result<Self, FairyError> {
         if field == null_string() {
             return Field::from_str_to_null(field);
         }
@@ -462,35 +462,35 @@ impl Field {
         }
     }
 
-    pub fn parse_int_from_str<T>(input: &str) -> Result<T, CrustyError>
+    pub fn parse_int_from_str<T>(input: &str) -> Result<T, FairyError>
     where
         T: std::str::FromStr + std::fmt::Debug, // T must be convertible from a string and debug-printable
     {
         match input.parse::<T>() {
             Ok(i) => Ok(i),
-            Err(_) => Err(CrustyError::ValidationError(format!(
+            Err(_) => Err(FairyError::ValidationError(format!(
                 "Invalid int field {}",
                 input
             ))),
         }
     }
 
-    pub fn from_str_to_decimal(field: &str, p: u32, s: u32) -> Result<Self, CrustyError> {
+    pub fn from_str_to_decimal(field: &str, p: u32, s: u32) -> Result<Self, FairyError> {
         // Divide the field into integer and fractional parts
         let parts = field.split('.').collect::<Vec<&str>>();
         if parts.len() > 2 {
-            return Err(CrustyError::ValidationError(format!(
+            return Err(FairyError::ValidationError(format!(
                 "Invalid decimal field {}",
                 field
             )));
         }
         let integer = parts[0].parse::<i64>().map_err(|_| {
-            CrustyError::ValidationError(format!("Invalid decimal field {}", field))
+            FairyError::ValidationError(format!("Invalid decimal field {}", field))
         })?;
 
         // Check the integer part
         if integer.abs() >= 10i64.pow(p - s) {
-            return Err(CrustyError::ValidationError(format!(
+            return Err(FairyError::ValidationError(format!(
                 "Invalid decimal field precision {}. Expected {} found {}",
                 field, p, s
             )));
@@ -498,10 +498,10 @@ impl Field {
         // if scale is 2, then adjusted_fractional is 0.05 -> 5, 0.5 -> 50
         let adjusted_fractional = if parts.len() == 2 {
             let fractional = parts[1].parse::<i64>().map_err(|_| {
-                CrustyError::ValidationError(format!("Invalid decimal field {}", field))
+                FairyError::ValidationError(format!("Invalid decimal field {}", field))
             })?;
             if fractional < 0 || fractional >= 10i64.pow(s) {
-                return Err(CrustyError::ValidationError(format!(
+                return Err(FairyError::ValidationError(format!(
                     "Invalid decimal field scale {}. Expected {} found {}",
                     field, p, s
                 )));
@@ -523,9 +523,9 @@ impl Field {
         }
     }
 
-    pub fn from_str_to_char(field: &str, length: u8) -> Result<Self, CrustyError> {
+    pub fn from_str_to_char(field: &str, length: u8) -> Result<Self, FairyError> {
         if field.len() > length as usize {
-            return Err(CrustyError::ValidationError(format!(
+            return Err(FairyError::ValidationError(format!(
                 "Invalid char field {}",
                 field
             )));
@@ -533,41 +533,41 @@ impl Field {
         Ok(Field::Char(length, field.to_string()))
     }
 
-    pub fn from_str_to_string(field: &str) -> Result<Self, CrustyError> {
+    pub fn from_str_to_string(field: &str) -> Result<Self, FairyError> {
         let value: String = field.to_string().clone();
         Ok(Field::String(value))
     }
 
-    pub fn from_str_to_date(field: &str) -> Result<Self, CrustyError> {
+    pub fn from_str_to_date(field: &str) -> Result<Self, FairyError> {
         let value = NaiveDate::parse_from_str(field, "%Y-%m-%d");
         if let Ok(date) = value {
             let days = date.signed_duration_since(base_date()).num_days();
             Ok(Field::Date(days))
         } else {
-            Err(CrustyError::ValidationError(format!(
+            Err(FairyError::ValidationError(format!(
                 "Invalid date field {}",
                 field
             )))
         }
     }
 
-    pub fn from_str_to_bool(field: &str) -> Result<Self, CrustyError> {
+    pub fn from_str_to_bool(field: &str) -> Result<Self, FairyError> {
         let value = field.parse::<bool>();
         if let Ok(value) = value {
             Ok(Field::Bool(value))
         } else {
-            Err(CrustyError::ValidationError(format!(
+            Err(FairyError::ValidationError(format!(
                 "Invalid bool field {}",
                 field
             )))
         }
     }
 
-    pub fn from_str_to_null(field: &str) -> Result<Self, CrustyError> {
+    pub fn from_str_to_null(field: &str) -> Result<Self, FairyError> {
         if field == null_string() {
             Ok(Field::Null)
         } else {
-            Err(CrustyError::ValidationError(format!(
+            Err(FairyError::ValidationError(format!(
                 "Invalid null field {}",
                 field
             )))

@@ -2,7 +2,7 @@ use super::OpIterator;
 use crate::Managers;
 
 use common::query::bytecode_expr::ByteCodeExpr;
-use common::{CrustyError, Field, TableSchema, Tuple};
+use common::{FairyError, Field, TableSchema, Tuple};
 use std::collections::HashMap;
 
 /// Hash equi-join implementation. (You can add any other fields that you think are neccessary)
@@ -64,7 +64,7 @@ impl OpIterator for HashEqJoin {
         self.right_child.configure(will_rewind);
     }
 
-    fn open(&mut self) -> Result<(), CrustyError> {
+    fn open(&mut self) -> Result<(), FairyError> {
         if !self.open {
             self.left_child.open()?;
             self.right_child.open()?;
@@ -80,7 +80,7 @@ impl OpIterator for HashEqJoin {
         Ok(())
     }
 
-    fn next(&mut self) -> Result<Option<Tuple>, CrustyError> {
+    fn next(&mut self) -> Result<Option<Tuple>, FairyError> {
         if !self.open {
             panic!("Operator has not been opened")
         }
@@ -99,7 +99,7 @@ impl OpIterator for HashEqJoin {
         Ok(None)
     }
 
-    fn close(&mut self) -> Result<(), CrustyError> {
+    fn close(&mut self) -> Result<(), FairyError> {
         if self.open {
             self.left_child.close()?;
             self.right_child.close()?;
@@ -111,7 +111,7 @@ impl OpIterator for HashEqJoin {
         Ok(())
     }
 
-    fn rewind(&mut self) -> Result<(), CrustyError> {
+    fn rewind(&mut self) -> Result<(), FairyError> {
         if !self.open {
             panic!("Operator has not been opened")
         }

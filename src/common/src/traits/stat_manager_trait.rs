@@ -6,22 +6,22 @@ use crate::{
 pub trait StatManagerTrait {
     fn new(config: &'static ServerConfig, mem_budget: usize) -> Self;
 
-    fn reset(&self) -> Result<(), CrustyError>;
+    fn reset(&self) -> Result<(), FairyError>;
 
-    fn shutdown(&self) -> Result<(), CrustyError>;
+    fn shutdown(&self) -> Result<(), FairyError>;
 
-    fn deleted_record(&self, value_id: &ValueId) -> Result<(), CrustyError>;
+    fn deleted_record(&self, value_id: &ValueId) -> Result<(), FairyError>;
 
-    fn register_table(&self, c_id: ContainerId, schema: TableSchema) -> Result<(), CrustyError>;
+    fn register_table(&self, c_id: ContainerId, schema: TableSchema) -> Result<(), FairyError>;
 
     fn updated_record(
         &self,
         tuple: &Tuple,
         value_id: &ValueId,
         old_value_id: Option<&ValueId>,
-    ) -> Result<(), CrustyError>;
+    ) -> Result<(), FairyError>;
 
-    fn new_record(&self, tuple: &Tuple, value_id: ValueId) -> Result<(), CrustyError>;
+    fn new_record(&self, tuple: &Tuple, value_id: ValueId) -> Result<(), FairyError>;
 
     /// Estimate the number of records and selectivity of the given predicate
     /// Note that the predicate (Expression<PhysicalRelExpr>) should be expressed
@@ -32,7 +32,7 @@ pub trait StatManagerTrait {
         &self,
         c_id: ContainerId,
         predicate: &[Expression<PhysicalRelExpr>],
-    ) -> Result<(usize, f64), CrustyError>;
+    ) -> Result<(usize, f64), FairyError>;
 
     /// Estimate the number of records and selectivity of the given join
     /// `join_ops`, `left_exprs`, and `right_exprs` should have the same length
@@ -48,7 +48,7 @@ pub trait StatManagerTrait {
         join_ops: &[BinaryOp],
         left_exprs: &[Expression<PhysicalRelExpr>],
         right_exprs: &[Expression<PhysicalRelExpr>],
-    ) -> Result<(usize, f64), CrustyError>;
+    ) -> Result<(usize, f64), FairyError>;
 
     /// Given a container and a column, estimate the probability of the attribute
     /// having distinct values. Currently, this function is not used in the codebase.
@@ -57,7 +57,7 @@ pub trait StatManagerTrait {
         &self,
         c_id: ContainerId,
         col_id: ColumnId,
-    ) -> Result<f64, CrustyError>;
+    ) -> Result<f64, FairyError>;
 
-    fn get_container_record_count(&self, c_id: ContainerId) -> Result<usize, CrustyError>;
+    fn get_container_record_count(&self, c_id: ContainerId) -> Result<usize, FairyError>;
 }

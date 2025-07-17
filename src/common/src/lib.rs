@@ -40,7 +40,7 @@ pub const MANAGERS_DIR_NAME: &str = "managers";
 pub const QUERY_CACHES_DIR_NAME: &str = "query_caches";
 
 pub mod prelude {
-    pub use crate::error::CrustyError;
+    pub use crate::error::FairyError;
     pub use crate::ids::Permissions;
     pub use crate::ids::{
         ColumnId, ContainerId, LogicalTimeStamp, Lsn, PageId, SlotId, StateType, TidType,
@@ -52,7 +52,7 @@ pub mod prelude {
     pub use crate::{table::TableSchema, tuple::Tuple};
 }
 
-pub use crate::error::{ConversionError, CrustyError};
+pub use crate::error::{ConversionError, FairyError};
 
 pub use crate::datatypes::{DataType, Field};
 pub use crate::query::operation::{AggOp, BinaryOp};

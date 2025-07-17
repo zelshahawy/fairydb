@@ -1,6 +1,6 @@
 use crate::table::TableSchema;
 use crate::tuple::Tuple;
-use crate::CrustyError;
+use crate::FairyError;
 use std::fmt;
 
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Clone)]
@@ -64,7 +64,7 @@ impl QueryResult {
     }
 
     /// Merge results
-    pub fn merge_results(&mut self, other: QueryResult) -> Result<(), CrustyError> {
+    pub fn merge_results(&mut self, other: QueryResult) -> Result<(), FairyError> {
         match (self, other) {
             (
                 QueryResult::Select {
@@ -79,14 +79,14 @@ impl QueryResult {
                 },
             ) => {
                 if *schema1 != schema2 {
-                    return Err(CrustyError::CrustyError(
+                    return Err(FairyError::FairyError(
                         "Schema mismatch when merging results.".to_string(),
                     ));
                 }
                 result1.append(&mut result2);
                 Ok(())
             }
-            _ => Err(CrustyError::CrustyError(
+            _ => Err(FairyError::FairyError(
                 "Cannot merge non-select results.".to_string(),
             )),
         }

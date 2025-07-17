@@ -1,5 +1,5 @@
 use super::OpIterator;
-use common::{error::c_err, CrustyError, TableSchema, Tuple};
+use common::{error::c_err, FairyError, TableSchema, Tuple};
 use serde::{Deserialize, Serialize};
 
 /// Iterator over a Vec of tuples, mainly used for testing.
@@ -40,7 +40,7 @@ impl TupleIterator {
         }
     }
 
-    pub fn from_json(mut json: serde_json::Value) -> Result<Self, CrustyError> {
+    pub fn from_json(mut json: serde_json::Value) -> Result<Self, FairyError> {
         assert!(json["type"] == "TupleIterator");
         let open = serde_json::from_value(json["open"].take())
             .map_err(|e| c_err(&format!("Failed to deserialize open: {}", e)))?;
@@ -69,7 +69,7 @@ impl OpIterator for TupleIterator {
     }
 
     /// Opens the iterator without returning a tuple.
-    fn open(&mut self) -> Result<(), CrustyError> {
+    fn open(&mut self) -> Result<(), FairyError> {
         if !self.open {
             self.open = true;
         }
@@ -81,7 +81,7 @@ impl OpIterator for TupleIterator {
     /// # Panics
     ///
     /// Panics if the TupleIterator has not been opened.
-    fn next(&mut self) -> Result<Option<Tuple>, CrustyError> {
+    fn next(&mut self) -> Result<Option<Tuple>, FairyError> {
         if !self.open {
             panic!("Operator has not been opened")
         }
@@ -100,13 +100,13 @@ impl OpIterator for TupleIterator {
     }
 
     /// Closes the tuple iterator.
-    fn close(&mut self) -> Result<(), CrustyError> {
+    fn close(&mut self) -> Result<(), FairyError> {
         self.index = 0;
         self.open = false;
         Ok(())
     }
 
-    fn rewind(&mut self) -> Result<(), CrustyError> {
+    fn rewind(&mut self) -> Result<(), FairyError> {
         if !self.open {
             panic!("Operator has not been opened")
         }

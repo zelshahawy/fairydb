@@ -39,7 +39,7 @@ impl Executor {
     }
 
     /// Consumes the opiterator and stores the result in a QueryResult.    
-    pub fn execute(&mut self) -> Result<QueryResult, CrustyError> {
+    pub fn execute(&mut self) -> Result<QueryResult, FairyError> {
         let mut opiterator = self.plan.take().unwrap();
         let schema = opiterator.get_schema().clone(); // clone the schema for returning
 
@@ -65,13 +65,13 @@ impl Executor {
         table_id: &ContainerId,
         table_schema: &TableSchema,
         txn_id: TransactionId,
-    ) -> Result<usize, CrustyError> {
+    ) -> Result<usize, FairyError> {
         let converted_result = mutator::convert_insert_vals(values)?; // This returns Vec<u8>
         let validated_converted_result =
             mutator::validate_tuples(table_id, table_schema, None, converted_result, &txn_id)?;
 
         if !validated_converted_result.unconverted.is_empty() {
-            return Err(CrustyError::ValidationError(format!(
+            return Err(FairyError::ValidationError(format!(
                 "Some records were not valid: {:?}",
                 validated_converted_result.unconverted
             )));
@@ -99,7 +99,7 @@ impl Executor {
         rdr: &mut dyn DataReader,
         table_id: &ContainerId,
         txn_id: TransactionId,
-    ) -> Result<usize, CrustyError> {
+    ) -> Result<usize, FairyError> {
         // TODO: Magic number
         let max_records_in_mem = 100000;
         let mut result_set = ConvertedResult::new();
@@ -130,7 +130,7 @@ impl Executor {
             // let validated_converted_result =
             //     mutator::validate_tuples(table_id, table_schema, None, result_set, &txn_id)?;
             if !result_set.unconverted.is_empty() {
-                return Err(CrustyError::ValidationError(format!(
+                return Err(FairyError::ValidationError(format!(
                     "Some records were not valid: {:?}",
                     result_set.unconverted
                 )));
@@ -234,7 +234,7 @@ mod test {
     }
 
     #[test]
-    fn test_to_op_iterator() -> Result<(), CrustyError> {
+    fn test_to_op_iterator() -> Result<(), FairyError> {
         let db = test_db();
         let lp = test_logical_plan();
         let tid = TransactionId::new();
@@ -265,7 +265,7 @@ mod test {
     }
 
     #[test]
-    fn test_next() -> Result<(), CrustyError> {
+    fn test_next() -> Result<(), FairyError> {
         let db = test_db();
         let lp = test_logical_plan();
         let tid = TransactionId::new();
@@ -299,7 +299,7 @@ mod test {
     }
 
     #[test]
-    fn test_get_field_indices_names() -> Result<(), CrustyError> {
+    fn test_get_field_indices_names() -> Result<(), FairyError> {
         let names = vec!["one", "two", "three", "four"];
         let aliases = vec!["1", "2", "3", "4"];
         let indices = vec![0, 1, 2, 3];

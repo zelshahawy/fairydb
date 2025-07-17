@@ -152,7 +152,9 @@
                     "kind": "lib"
                 }
             },
-            "args": ["test_dirty"],
+            "args": [
+                "test_dirty"
+            ],
             "cwd": "${workspaceFolder}"
         },
         {
@@ -177,15 +179,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'cli-crusty'",
+            "name": "Debug executable 'cli-fairy'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=cli-crusty",
-                    "--package=cli-crusty"
+                    "--bin=cli-fairy",
+                    "--package=cli-fairy"
                 ],
                 "filter": {
-                    "name": "cli-crusty",
+                    "name": "cli-fairy",
                     "kind": "bin"
                 }
             },
@@ -195,16 +197,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'cli-crusty'",
+            "name": "Debug unit tests in executable 'cli-fairy'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=cli-crusty",
-                    "--package=cli-crusty"
+                    "--bin=cli-fairy",
+                    "--package=cli-fairy"
                 ],
                 "filter": {
-                    "name": "cli-crusty",
+                    "name": "cli-fairy",
                     "kind": "bin"
                 }
             },

@@ -18,21 +18,21 @@ impl TransactionManagerTrait for MockTransactionManager {
         Self {}
     }
 
-    fn shutdown(&self) -> Result<(), CrustyError> {
+    fn shutdown(&self) -> Result<(), FairyError> {
         info!("TODO: txn manager shutdown is a stub");
         Ok(())
     }
 
-    fn reset(&self) -> Result<(), CrustyError> {
+    fn reset(&self) -> Result<(), FairyError> {
         info!("TODO: txn manager reset is a stub");
         Ok(())
     }
 
-    fn set_isolation_level(&self, _lvl: IsolationLevel) -> Result<(), CrustyError> {
+    fn set_isolation_level(&self, _lvl: IsolationLevel) -> Result<(), FairyError> {
         Ok(())
     }
 
-    fn start_transaction(&self, _tid: TransactionId) -> Result<(), CrustyError> {
+    fn start_transaction(&self, _tid: TransactionId) -> Result<(), FairyError> {
         Ok(())
     }
 
@@ -41,7 +41,7 @@ impl TransactionManagerTrait for MockTransactionManager {
         _tuple: &Tuple,
         _value_id: &ValueId,
         _tid: &TransactionId,
-    ) -> Result<(), CrustyError> {
+    ) -> Result<(), FairyError> {
         Ok(())
     }
 
@@ -51,7 +51,7 @@ impl TransactionManagerTrait for MockTransactionManager {
         _value_id: &ValueId,
         _tid: &TransactionId,
         _changes: &TupleAssignments,
-    ) -> Result<(), CrustyError> {
+    ) -> Result<(), FairyError> {
         Ok(())
     }
 
@@ -62,7 +62,7 @@ impl TransactionManagerTrait for MockTransactionManager {
         _old_value_id: &ValueId,
         _tid: &TransactionId,
         _changes: &TupleAssignments,
-    ) -> Result<(), CrustyError> {
+    ) -> Result<(), FairyError> {
         Ok(())
     }
 
@@ -70,7 +70,7 @@ impl TransactionManagerTrait for MockTransactionManager {
         &self,
         _tuple: &mut Tuple,
         _tid: TransactionId,
-    ) -> Result<(), CrustyError> {
+    ) -> Result<(), FairyError> {
         Ok(())
     }
 
@@ -79,7 +79,7 @@ impl TransactionManagerTrait for MockTransactionManager {
         _tuple: &mut Tuple,
         _value_id: ValueId,
         _tid: TransactionId,
-    ) -> Result<(), CrustyError> {
+    ) -> Result<(), FairyError> {
         Ok(())
     }
 
@@ -87,19 +87,19 @@ impl TransactionManagerTrait for MockTransactionManager {
         &self,
         _predicate: Expression<LogicalRelExpr>,
         _tid: TransactionId,
-    ) -> Result<(), CrustyError> {
+    ) -> Result<(), FairyError> {
         Ok(())
     }
 
-    fn validate_txn(&self, _tid: TransactionId) -> Result<(), CrustyError> {
+    fn validate_txn(&self, _tid: TransactionId) -> Result<(), FairyError> {
         Ok(())
     }
 
-    fn rollback_txn(&self, _tid: TransactionId) -> Result<(), CrustyError> {
+    fn rollback_txn(&self, _tid: TransactionId) -> Result<(), FairyError> {
         Ok(())
     }
 
-    fn commit_txn(&self, _tid: TransactionId) -> Result<(), CrustyError> {
+    fn commit_txn(&self, _tid: TransactionId) -> Result<(), FairyError> {
         Ok(())
     }
 }

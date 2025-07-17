@@ -6,7 +6,7 @@ use common::commands::{self, Command, CommandWithArgs, DBCommand, Response, Syst
 
 use common::error::c_err;
 use common::QUERY_CACHES_DIR_NAME;
-use common::{ids::TransactionId, CrustyError, QueryResult};
+use common::{ids::TransactionId, FairyError, QueryResult};
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -82,7 +82,7 @@ fn run_system_command(
     server_state: &'static ServerState,
     system_command: SystemCommand,
     command_args: &[String],
-) -> Result<(bool, Response), CrustyError> {
+) -> Result<(bool, Response), FairyError> {
     match system_command {
         SystemCommand::ShowDatabases => {
             let db_names = server_state.get_db_names();
@@ -150,7 +150,7 @@ pub fn run_database_command(
     command_args: &[String],
     tid: TransactionId,
     client_id: u64,
-) -> Result<(bool, Response), CrustyError> {
+) -> Result<(bool, Response), FairyError> {
     match database_command {
         DBCommand::ExecuteSQL => {
             let sql = command_args.first().expect("SQL not provided").to_string();

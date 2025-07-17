@@ -65,7 +65,7 @@ impl Managers {
         self.sm.shutdown();
     }
 
-    pub fn reset(&self) -> Result<(), CrustyError> {
+    pub fn reset(&self) -> Result<(), FairyError> {
         // not responsible for clearing serialized data. see caller for that.
         self.strm.reset()?;
         self.stats.reset()?;

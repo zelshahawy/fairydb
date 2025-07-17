@@ -14,20 +14,20 @@ pub trait TransactionManagerTrait {
     where
         Self: Sized;
 
-    fn shutdown(&self) -> Result<(), CrustyError>;
+    fn shutdown(&self) -> Result<(), FairyError>;
 
-    fn reset(&self) -> Result<(), CrustyError>;
+    fn reset(&self) -> Result<(), FairyError>;
 
-    fn set_isolation_level(&self, lvl: IsolationLevel) -> Result<(), CrustyError>;
+    fn set_isolation_level(&self, lvl: IsolationLevel) -> Result<(), FairyError>;
 
-    fn start_transaction(&self, tid: TransactionId) -> Result<(), CrustyError>;
+    fn start_transaction(&self, tid: TransactionId) -> Result<(), FairyError>;
 
     fn read_record(
         &self,
         tuple: &Tuple,
         value_id: &ValueId,
         tid: &TransactionId,
-    ) -> Result<(), CrustyError>;
+    ) -> Result<(), FairyError>;
 
     fn pre_update_record(
         &self,
@@ -35,7 +35,7 @@ pub trait TransactionManagerTrait {
         value_id: &ValueId,
         tid: &TransactionId,
         changes: &TupleAssignments,
-    ) -> Result<(), CrustyError>;
+    ) -> Result<(), FairyError>;
 
     fn post_update_record(
         &self,
@@ -44,26 +44,26 @@ pub trait TransactionManagerTrait {
         old_value_id: &ValueId,
         tid: &TransactionId,
         changes: &TupleAssignments,
-    ) -> Result<(), CrustyError>;
+    ) -> Result<(), FairyError>;
 
-    fn pre_insert_record(&self, tuple: &mut Tuple, tid: TransactionId) -> Result<(), CrustyError>;
+    fn pre_insert_record(&self, tuple: &mut Tuple, tid: TransactionId) -> Result<(), FairyError>;
 
     fn post_insert_record(
         &self,
         tuple: &mut Tuple,
         value_id: ValueId,
         tid: TransactionId,
-    ) -> Result<(), CrustyError>;
+    ) -> Result<(), FairyError>;
 
     fn read_predicate(
         &self,
         predicate: Expression<LogicalRelExpr>,
         tid: TransactionId,
-    ) -> Result<(), CrustyError>;
+    ) -> Result<(), FairyError>;
 
-    fn validate_txn(&self, tid: TransactionId) -> Result<(), CrustyError>;
+    fn validate_txn(&self, tid: TransactionId) -> Result<(), FairyError>;
 
-    fn rollback_txn(&self, tid: TransactionId) -> Result<(), CrustyError>;
+    fn rollback_txn(&self, tid: TransactionId) -> Result<(), FairyError>;
 
-    fn commit_txn(&self, tid: TransactionId) -> Result<(), CrustyError>;
+    fn commit_txn(&self, tid: TransactionId) -> Result<(), FairyError>;
 }

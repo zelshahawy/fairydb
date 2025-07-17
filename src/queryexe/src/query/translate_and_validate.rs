@@ -19,7 +19,7 @@ use common::{
     AggOp, BinaryOp,
 };
 use common::{logical_expr::prelude::LogicalRelExpr, Field};
-use common::{CrustyError, DataType};
+use common::{FairyError, DataType};
 use sqlparser::ast::{self, ExactNumberInfo};
 
 /// Retrieve the name from the command parser object.
@@ -28,9 +28,9 @@ use sqlparser::ast::{self, ExactNumberInfo};
 ///
 /// * `name` - Name object from the command parser.
 ///   FIXME: This function serves the same purpose as `get_table_name` below.
-pub fn get_name(name: &ast::ObjectName) -> Result<String, CrustyError> {
+pub fn get_name(name: &ast::ObjectName) -> Result<String, FairyError> {
     if name.0.len() > 1 {
-        Err(CrustyError::CrustyError(String::from(
+        Err(FairyError::FairyError(String::from(
             "Error no . names supported",
         )))
     } else {
@@ -43,7 +43,7 @@ pub fn get_name(name: &ast::ObjectName) -> Result<String, CrustyError> {
 /// # Argument
 ///
 /// * `dtype` - Name object from the command parser.
-pub fn get_attr(dtype: &ast::DataType) -> Result<DataType, CrustyError> {
+pub fn get_attr(dtype: &ast::DataType) -> Result<DataType, FairyError> {
     match dtype {
         ast::DataType::Int(_) | ast::DataType::Integer(_) => Ok(DataType::BigInt),
         ast::DataType::Varchar(_) => Ok(DataType::String),
@@ -59,7 +59,7 @@ pub fn get_attr(dtype: &ast::DataType) -> Result<DataType, CrustyError> {
                 default_decimal_scale(),
             )),
         },
-        _ => Err(CrustyError::CrustyError(format!(
+        _ => Err(FairyError::FairyError(format!(
             "Unsupported data type {:?}",
             dtype
         ))),
