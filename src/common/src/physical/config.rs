@@ -42,7 +42,7 @@ pub struct ServerConfig {
 impl Default for ServerConfig {
     fn default() -> Self {
         ServerConfig {
-            host: "fairydb-server".to_owned(),
+            host: "127.0.0.1".to_owned(),
             port: "3333".to_owned(),
             db_path: "fairy_data/persist/default/".into(),
             log_file: "".to_owned(),
@@ -158,7 +158,7 @@ pub struct ClientConfig {
 impl Default for ClientConfig {
     fn default() -> Self {
         ClientConfig {
-            host: "fairydb-server".to_owned(),
+            host: "127.0.0.1".to_owned(),
             port: "3333".to_owned(),
             script: "".to_owned(),
         }
@@ -180,7 +180,7 @@ impl ClientConfig {
             host: if !cli_config.host.is_empty() {
                 cli_config.host
             } else {
-                "fairydb-server".to_owned()
+                "127.0.0.1".to_owned()
             },
             port: if !cli_config.port.is_empty() {
                 cli_config.port
@@ -201,7 +201,7 @@ mod tests {
     #[test]
     fn test_server_config_default() {
         let config = ServerConfig::default();
-        assert_eq!(config.host, "fairydb-server");
+        assert_eq!(config.host, "127.0.0.1");
         assert_eq!(config.port, "3333");
         assert_eq!(config.db_path, PathBuf::from("fairy_data/persist/default/"));
         assert_eq!(config.log_file, "");

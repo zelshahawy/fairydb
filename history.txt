@@ -1,44 +1,4 @@
 #V2
-\\shutdown
-\\r mydb
-\\r mydb1
-\\c mydb1
-cREATE TABLE users (id INTEGER PRIMARY KEY)
-\\r mydb
-\\c mydb
-cREATE TABLE users (id INTEGER PRIMARY KEY)
-INSERT INTO users VALUES (1)
-INSERT INTO users VALUES (2)
-INSERT INTO users VALUES (3)
-INSERT INTO users VALUES (4)
-INSERT INTO users VALUES (5)
-INSERT INTO users VALUES (6)
-INSERT INTO users VALUES (7)
-INSERT INTO users VALUES (8)
-ELECT * FROM users
-SELECT * FROM users
-\\shutdown
-\\r mydb
-\\c mydb
-INSERT INTO users VALUES (1),(2),(3),(4),(5),(6),(7),(8);
-\\r mydb
-\\r CREATE TABLE users (\n  id BIGINT PRIMARY KEY\n);
-INSERT INTO users VALUES (1),(2),(3),(4),(5),(6),(7),(8);
-\\c mydb
-CREATE TABLE users (\n  id BIGINT PRIMARY KEY\n);
-CREATE TABLE users (\n  id INTEGER PRIMARY KEY\n);
-INSERT INTO users VALUES (1),(2),(3),(4),(5),(6),(7),(8);
-cREATE TABLE RENS (\n  id INTEGER PRIMARY KEY\n);
-\\shutdown
-SELECT * FROM RENS
-\\c mydb
-SELECT * from RENS
-SELECT * from S
-\\shutdown
-\\r mydb
-\\c mydb
-INSERT INTO RENS VALUES (1), (2);
-/r mydb
 \\r mydb
 \\r mydb2
 \\c mydb
@@ -97,5 +57,45 @@ CREATE TABLE users (id INTEGER PRIMARY KEY, name VARCHAR(255));
 INSERT INTO users VALUES (1, 'alice');
 SELECT * FROM users;
 INSERT INTO users VALUES (110, 'greg');
+SELECT * FROM users;
+\\shutdown
+\\r testdb
+\\c testdb
+CREATE TABLE test (a INT, b INT, primary key (a));
+INSERT INTO users VALUES (1, 'alice');
+\\shutdown
+\\r mydb
+\\c mydb
+CREATE TABLE users (id INTEGER PRIMARY KEY, name VARCHAR(255));
+INSERT INTO users VALUES (1, 'alice'); 
+SELECT * FROM users;
+INSERT INTO users VALUES (2, 'Ziad'); 
+INSERT INTO users VALUES (3, 'johnathan'); 
+SELECT * FROM users;
+\\shutdown
+\\c mydb
+\\r mydb
+\\c mydb
+CREATE TABLE users (id INTEGER PRIMARY KEY, name VARCHAR(255));
+\\shutdown
+\\r mydb
+\\c mydb
+CREATE TABLE users (id INTEGER PRIMARY KEY, name VARCHAR(255));
+INSERT INTO users VALUES (2, 'Ziad');
+INSERT INTO users VALUES (1, 'johnathan');
+INSERT INTO users VALUES (3, 'Peter');
+INSERT INTO users VALUES (4, 'Melissa');
+SELECT * FROM users;
+INSERT INTO users VALUES (10, 'Dave');
+SELECT * FROM users;
+exit
+exit()
+EXIT
+\\shutdown
+\\c mydb
+SELECT * FROM users;
+\\shutdown
+SELECT * FROM users;
+\\c mydb
 SELECT * FROM users;
 \\shutdown
