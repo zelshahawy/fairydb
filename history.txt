@@ -1,14 +1,4 @@
 #V2
-\\c mudb
-\\c mydb
-cREATE TABLE users (id INTEGER PRIMARY KEY
-cREATE TABLE users (id INTEGER PRIMARY KEY)
-INSERT INTO users VALUES (1)
-\\shutdown
-\\c mydb
-SELECT * FROM users;
-SELECT * FROM users
-INSERT INTO users VALUES (2)
 \\shutdown
 \\r mydb
 \\r mydb1
@@ -98,4 +88,14 @@ CREATE TABLE USERS (id INTEGERS PRIMARY KEY);
 CREATE TABLE USERS (id INTEGER PRIMARY KEY);
 INSERT INTO USERS VALUES (1),(2),(3),(4),(5),(6),(7),(8);
 SELECT * FROM USERS
+\\shutdown
+\\d
+/d
+\\r mydb
+\\c mydb
+CREATE TABLE users (id INTEGER PRIMARY KEY, name VARCHAR(255));
+INSERT INTO users VALUES (1, 'alice');
+SELECT * FROM users;
+INSERT INTO users VALUES (110, 'greg');
+SELECT * FROM users;
 \\shutdown
