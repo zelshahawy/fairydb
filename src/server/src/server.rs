@@ -149,6 +149,10 @@ impl Server {
             "Server listening on with host {} on port {} with storage dir {:?}.",
             self.config.host, self.config.port, self.config.db_path
         );
+        println!(
+            "Server listening on with host {} on port {} with storage dir {:?}.",
+            self.config.host, self.config.port, self.config.db_path
+        );
 
         // (TODO) Here, we spawn a new thread for each client connection. This is not ideal.
         // Ideally, the loop should just put the request into a queue and the
