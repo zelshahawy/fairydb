@@ -15,7 +15,7 @@ pub(crate) fn insert_validated_tuples(
     tuples: &Vec<Tuple>,
     txn_id: TransactionId,
     managers: &'static Managers,
-) -> Result<usize, CrustyError> {
+) -> Result<usize, FairyError> {
     let mut tuples_bytes = Vec::new();
     for t in tuples {
         tuples_bytes.push(t.to_bytes());
@@ -30,7 +30,7 @@ pub(crate) fn insert_validated_tuples(
         managers.stats.set_ts(table_id, txn_id.id());
         Ok(insert_count)
     } else {
-        Err(CrustyError::ExecutionError(format!(
+        Err(FairyError::ExecutionError(format!(
             "Attempting to insert {} tuples and only {} were inserted",
             tuples.len(),
             insert_count
@@ -45,9 +45,9 @@ pub(crate) fn validate_tuples(
     col_order: Option<Vec<usize>>,
     mut values: ConvertedResult,
     _txn_id: &TransactionId,
-) -> Result<ConvertedResult, CrustyError> {
+) -> Result<ConvertedResult, FairyError> {
     if col_order.is_some() {
-        return Err(CrustyError::CrustyError(String::from(
+        return Err(FairyError::FairyError(String::from(
             "Col ordering not supported",
         )));
     }
@@ -97,7 +97,7 @@ pub(crate) fn validate_tuples(
 }
 
 /// Convert data from SQL parser insert and convert to internal representation
-pub(crate) fn convert_insert_vals(values: &Values) -> Result<ConvertedResult, CrustyError> {
+pub(crate) fn convert_insert_vals(values: &Values) -> Result<ConvertedResult, FairyError> {
     let mut res = ConvertedResult {
         converted: Vec::new(),
         unconverted: Vec::new(),
@@ -145,7 +145,7 @@ pub(crate) fn convert_insert_vals(values: &Values) -> Result<ConvertedResult, Cr
                     }
                 }
             } else {
-                return Err(CrustyError::CrustyError(String::from(
+                return Err(FairyError::FairyError(String::from(
                     "Only values supported in insert",
                 )));
             }

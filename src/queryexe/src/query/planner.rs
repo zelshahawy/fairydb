@@ -12,7 +12,7 @@ use common::{
     physical_expr::physical_rel_expr::PhysicalRelExpr,
     query::bytecode_expr::{ByteCodeExpr, ByteCodes},
     traits::plan::Plan,
-    BinaryOp, CrustyError, TableSchema,
+    BinaryOp, FairyError, TableSchema,
 };
 use std::collections::HashMap;
 
@@ -29,11 +29,11 @@ use std::collections::HashMap;
 ///
 /// # Returns
 ///
-/// * `Result<ByteCodeExpr, CrustyError>` - The converted bytecode expression.
+/// * `Result<ByteCodeExpr, FairyError>` - The converted bytecode expression.
 pub fn convert_expr_to_bytecode<P: Plan>(
     expr: Expression<P>,
     col_id_to_idx: Option<&HashMap<ColumnId, ColumnId>>,
-) -> Result<ByteCodeExpr, CrustyError> {
+) -> Result<ByteCodeExpr, FairyError> {
     let mut bound_expr = expr;
     if let Some(col_id_to_idx) = col_id_to_idx {
         bound_expr = bound_expr.replace_variables(col_id_to_idx);
@@ -57,11 +57,11 @@ pub fn convert_expr_to_bytecode<P: Plan>(
 ///
 /// # Returns
 ///
-/// * `Result<(), CrustyError>` - Ok(()) if the conversion is successful
+/// * `Result<(), FairyError>` - Ok(()) if the conversion is successful
 fn convert_expr_to_bytecode_inner<P: Plan>(
     expr: &Expression<P>,
     bytecode_expr: &mut ByteCodeExpr,
-) -> Result<(), CrustyError> {
+) -> Result<(), FairyError> {
     match expr {
         Expression::Field { val: l } => {
             let i = bytecode_expr.add_literal(l.clone());
@@ -121,14 +121,14 @@ fn convert_expr_to_bytecode_inner<P: Plan>(
 ///
 /// # Returns
 ///
-/// * `Result<Box<dyn OpIterator>, CrustyError>` - The converted root opiterator
+/// * `Result<Box<dyn OpIterator>, FairyError>` - The converted root opiterator
 pub fn physical_plan_to_op_iterator(
     managers: &'static Managers,
     catalog: &CatalogRef,
     physical_plan: &PhysicalRelExpr,
     tid: TransactionId,
     timestamp: LogicalTimeStamp,
-) -> Result<Box<dyn OpIterator>, CrustyError> {
+) -> Result<Box<dyn OpIterator>, FairyError> {
     let (result, _) =
         physical_plan_to_op_iterator_helper(managers, catalog, physical_plan, tid, timestamp);
     result
@@ -151,7 +151,7 @@ pub fn physical_plan_to_op_iterator(
 ///
 /// # Returns
 ///
-/// * `Result<(Box<dyn OpIterator>, HashMap<ColumnId, ColumnId>), CrustyError>` -
+/// * `Result<(Box<dyn OpIterator>, HashMap<ColumnId, ColumnId>), FairyError>` -
 ///   The converted opiterator and a mapping from the unique column ID to the
 ///   index of the column in the schema
 fn physical_plan_to_op_iterator_helper(
@@ -161,10 +161,10 @@ fn physical_plan_to_op_iterator_helper(
     tid: TransactionId,
     _timestamp: LogicalTimeStamp,
 ) -> (
-    Result<Box<dyn OpIterator>, CrustyError>,
+    Result<Box<dyn OpIterator>, FairyError>,
     HashMap<ColumnId, ColumnId>,
 ) {
-    let err = CrustyError::ExecutionError(String::from("Malformed logical plan"));
+    let err = FairyError::ExecutionError(String::from("Malformed logical plan"));
 
     match physical_plan {
         PhysicalRelExpr::Scan {
@@ -223,7 +223,7 @@ fn physical_plan_to_op_iterator_helper(
                 cols.iter()
                     .map(|i| Expression::<PhysicalRelExpr>::ColRef { id: *i })
                     .map(|e| convert_expr_to_bytecode(e, Some(&col_id_to_idx)))
-                    .collect::<Result<Vec<ByteCodeExpr>, CrustyError>>()
+                    .collect::<Result<Vec<ByteCodeExpr>, FairyError>>()
                     .unwrap(),
                 schema,
                 src_iter.unwrap(),
@@ -501,7 +501,7 @@ fn physical_plan_to_op_iterator_helper(
             let mut fields = (0..in_schema.size())
                 .map(|i| Expression::<PhysicalRelExpr>::ColRef { id: i })
                 .map(|e| convert_expr_to_bytecode(e, None))
-                .collect::<Result<Vec<ByteCodeExpr>, CrustyError>>()
+                .collect::<Result<Vec<ByteCodeExpr>, FairyError>>()
                 .unwrap();
             let mut new_col_id_to_idx = col_id_to_idx.clone();
 

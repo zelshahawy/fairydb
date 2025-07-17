@@ -1,5 +1,5 @@
 use common::ids::TransactionId;
-use common::CrustyError;
+use common::FairyError;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum TxnState {
@@ -40,22 +40,22 @@ impl Transaction {
     }
 
     /// Returns the transaction id.
-    pub fn tid(&self) -> Result<TransactionId, CrustyError> {
+    pub fn tid(&self) -> Result<TransactionId, FairyError> {
         if self.state != TxnState::Active {
-            Err(CrustyError::TransactionNotActive)
+            Err(FairyError::TransactionNotActive)
         } else {
             Ok(self.tid)
         }
     }
 
     /// Commits the transaction.
-    pub fn commit(&mut self) -> Result<(), CrustyError> {
+    pub fn commit(&mut self) -> Result<(), FairyError> {
         self.state = TxnState::PartiallyCommitted;
         self.complete()
     }
 
     /// Aborts the transaction.
-    pub fn abort(&mut self) -> Result<(), CrustyError> {
+    pub fn abort(&mut self) -> Result<(), FairyError> {
         self.state = TxnState::Failed;
         self.complete()
     }
@@ -65,7 +65,7 @@ impl Transaction {
     /// # Arguments
     ///
     /// * `commit` - True if the transaction should commit.
-    pub fn complete(&mut self) -> Result<(), CrustyError> {
+    pub fn complete(&mut self) -> Result<(), FairyError> {
         if self.state != TxnState::PartiallyCommitted || self.state != TxnState::Failed {
             error!(
                 "Error: FIXME, need to notify on txn complete {:?}",

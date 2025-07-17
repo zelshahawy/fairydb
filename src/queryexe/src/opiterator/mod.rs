@@ -9,7 +9,7 @@ pub use self::sort::Sort;
 pub use self::sort_merge_join::SortMergeJoin;
 pub use self::tuple_iterator::TupleIterator;
 pub use self::update::Update;
-use common::{CrustyError, TableSchema, Tuple};
+use common::{FairyError, TableSchema, Tuple};
 
 mod aggregate;
 mod cross_join;
@@ -53,7 +53,7 @@ pub trait OpIterator {
     /// If the operator is already open, this function should do nothing.
     /// Therefore a typical implementation of open would be:
     /// ```
-    /// fn open(&mut self) -> Result<(), CrustyError> {
+    /// fn open(&mut self) -> Result<(), FairyError> {
     ///    if self.open {
     ///       // initialize the states
     ///       self.open = true;
@@ -61,7 +61,7 @@ pub trait OpIterator {
     ///   Ok(())
     /// }
     /// ```
-    fn open(&mut self) -> Result<(), CrustyError>;
+    fn open(&mut self) -> Result<(), FairyError>;
 
     /// Advances the iterator and returns the next tuple from the operator.
     ///
@@ -70,7 +70,7 @@ pub trait OpIterator {
     /// # Panics
     ///
     /// Panic if iterator is not open.
-    fn next(&mut self) -> Result<Option<Tuple>, CrustyError>;
+    fn next(&mut self) -> Result<Option<Tuple>, FairyError>;
 
     /// Resets the states of the operator.
     ///
@@ -83,7 +83,7 @@ pub trait OpIterator {
     /// to allow the operator to be re-opened. For example, if the operator is a
     /// hash-join, close should not change the join predicates because join predicates
     /// are needed when the operator is re-opened.
-    fn close(&mut self) -> Result<(), CrustyError>;
+    fn close(&mut self) -> Result<(), FairyError>;
 
     /// Returns the iterator to the start.
     ///
@@ -96,7 +96,7 @@ pub trait OpIterator {
     ///
     /// A typical implementation of rewind for a stateless operator would be:
     /// ```ignore
-    /// fn rewind(&mut self) -> Result<(), CrustyError> {
+    /// fn rewind(&mut self) -> Result<(), FairyError> {
     ///     if !self.open {
     ///         panic!("Operator has not been opened")
     ///     }
@@ -108,7 +108,7 @@ pub trait OpIterator {
     /// For example, if the operator is a hash-join, rewind should not clean up
     /// the hash table. rewind only need to guarantee that call to next()
     /// immediately after rewind() should return the first tuple in the result.
-    fn rewind(&mut self) -> Result<(), CrustyError>;
+    fn rewind(&mut self) -> Result<(), FairyError>;
 
     /// Returns the schema associated with this OpIterator.
     fn get_schema(&self) -> &TableSchema;
@@ -127,19 +127,19 @@ impl OpIterator for DummyOpIterator {
         // do nothing
     }
 
-    fn open(&mut self) -> Result<(), CrustyError> {
+    fn open(&mut self) -> Result<(), FairyError> {
         unimplemented!()
     }
 
-    fn next(&mut self) -> Result<Option<Tuple>, CrustyError> {
+    fn next(&mut self) -> Result<Option<Tuple>, FairyError> {
         unimplemented!()
     }
 
-    fn close(&mut self) -> Result<(), CrustyError> {
+    fn close(&mut self) -> Result<(), FairyError> {
         unimplemented!()
     }
 
-    fn rewind(&mut self) -> Result<(), CrustyError> {
+    fn rewind(&mut self) -> Result<(), FairyError> {
         unimplemented!()
     }
 

@@ -1,11 +1,7 @@
 [package]
 name = "utilities"
 version = "0.1.0"
-authors = [
-    "Aaron Elmore <aelmore@cs.uchicago.edu>",
-    "Raul Castro Fernandez <raulcf@uchicago.edu>",
-    "Daisy Barbanel", "Noah Banholzer",
-    "William Ma <williamma@uchicago.edu>"]
+authors = ["Ziad Elshahawy <zelshahawy@uchicago.edu>"]
 edition = "2021"
 
 [lib]

@@ -6,7 +6,7 @@ use std::sync::RwLock;
 use crate::database_state::DatabaseState;
 
 use common::error::c_err;
-use common::{CrustyError, QUERY_CACHES_DIR_NAME};
+use common::{FairyError, QUERY_CACHES_DIR_NAME};
 
 use queryexe::Managers;
 
@@ -25,7 +25,7 @@ pub struct ServerState {
 }
 
 impl ServerState {
-    pub(crate) fn new(base_dir: &Path, managers: &'static Managers) -> Result<Self, CrustyError> {
+    pub(crate) fn new(base_dir: &Path, managers: &'static Managers) -> Result<Self, FairyError> {
         // Create databases
         let server_state_dir = base_dir.join(SERVER_STATE_DIR);
         debug!("Looking for databases in {:?}", server_state_dir);
@@ -63,20 +63,20 @@ impl ServerState {
         Ok(server_state)
     }
 
-    pub fn get_connected_db(&self, client_id: u64) -> Result<&'static DatabaseState, CrustyError> {
+    pub fn get_connected_db(&self, client_id: u64) -> Result<&'static DatabaseState, FairyError> {
         let active_connections = self.active_connections.read().unwrap();
         match active_connections.get(&client_id) {
             Some(db_id) => {
                 let id_to_db = self.id_to_db.read().unwrap();
                 match id_to_db.get(db_id) {
                     Some(db) => Ok(db),
-                    None => Err(CrustyError::CrustyError(format!(
+                    None => Err(FairyError::FairyError(format!(
                         "database with id {:?} is not found",
                         db_id
                     ))),
                 }
             }
-            None => Err(CrustyError::CrustyError(format!(
+            None => Err(FairyError::FairyError(format!(
                 "client with id {:?} is not connected to a database",
                 client_id
             ))),
@@ -89,7 +89,7 @@ impl ServerState {
     }
 
     /// Reset the server
-    pub fn reset(&self) -> Result<(), CrustyError> {
+    pub fn reset(&self) -> Result<(), FairyError> {
         // Clear out each DB state
         let mut id_to_db = self.id_to_db.write().unwrap();
         for db in id_to_db.values() {
@@ -115,7 +115,7 @@ impl ServerState {
         Ok(())
     }
 
-    pub(crate) fn shutdown(&self) -> Result<(), CrustyError> {
+    pub(crate) fn shutdown(&self) -> Result<(), FairyError> {
         info!("Shutting down");
 
         // Shutdown/persist DB state
@@ -141,7 +141,7 @@ impl ServerState {
                 }
             } else {
                 error!("server_state_dir should exist");
-                return Err(CrustyError::IOError(
+                return Err(FairyError::IOError(
                     "server_state_dir should exist".to_string(),
                 ));
             }
@@ -158,19 +158,19 @@ impl ServerState {
         Ok(())
     }
 
-    pub fn create_new_db(&self, name: &str) -> Result<(), CrustyError> {
+    pub fn create_new_db(&self, name: &str) -> Result<(), FairyError> {
         let db_id = DatabaseState::get_database_id(name);
 
         let mut id_to_db = self.id_to_db.write().unwrap();
 
         match id_to_db.entry(db_id) {
-            Entry::Occupied(_) => Err(CrustyError::CrustyError(format!(
+            Entry::Occupied(_) => Err(FairyError::FairyError(format!(
                 "database with name {:?} already exists",
                 name
             ))),
             Entry::Vacant(entry) => {
                 let db_state = DatabaseState::new_from_name(name, self.managers).map_err(|e| {
-                    CrustyError::CrustyError(format!("Failed to create database state: {}", e))
+                    FairyError::FairyError(format!("Failed to create database state: {}", e))
                 })?;
                 entry.insert(Box::leak(Box::new(db_state)));
                 Ok(())
@@ -178,7 +178,7 @@ impl ServerState {
         }
     }
 
-    pub fn connect_to_db(&self, db_name: &str, client_id: u64) -> Result<(), CrustyError> {
+    pub fn connect_to_db(&self, db_name: &str, client_id: u64) -> Result<(), FairyError> {
         let db_id = self.get_db_id_from_name(db_name)?;
         let mut active_connections = self.active_connections.write().unwrap();
         active_connections.insert(client_id, db_id);
@@ -190,13 +190,13 @@ impl ServerState {
         active_connections.remove(&client_id);
     }
 
-    fn get_db_id_from_name(&self, db_name: &str) -> Result<u64, CrustyError> {
+    fn get_db_id_from_name(&self, db_name: &str) -> Result<u64, FairyError> {
         let map_ref = self.id_to_db.read().unwrap();
         for (db_id, db_state) in map_ref.iter() {
             if db_state.name == db_name {
                 return Ok(*db_id);
             }
         }
-        Err(CrustyError::CrustyError(String::from("db_name not found!")))
+        Err(FairyError::FairyError(String::from("db_name not found!")))
     }
 }

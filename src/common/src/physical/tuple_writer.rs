@@ -1,4 +1,4 @@
-use crate::{CrustyError, TableSchema, Tuple};
+use crate::{FairyError, TableSchema, Tuple};
 
 pub trait TupleConverterTrait {
     //// Creates a new TupleConverterTrait instance with the given schema.
@@ -12,5 +12,5 @@ pub trait TupleConverterTrait {
     /// Reads a tuple from the buffer at the specified offset and length.
     /// Returns a Result with the tuple if successful, or an error if not.
     /// The length of the tuple's bytes is specified by the len parameter.
-    fn read_tuple(&self, buf: &[u8], offset: usize, len: usize) -> Result<Tuple, CrustyError>;
+    fn read_tuple(&self, buf: &[u8], offset: usize, len: usize) -> Result<Tuple, FairyError>;
 }

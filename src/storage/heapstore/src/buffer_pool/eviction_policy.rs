@@ -1,4 +1,5 @@
 use std::cell::RefCell;
+use std::sync::atomic::{self, AtomicU64, Ordering};
 
 use rand::rngs::SmallRng;
 use rand::{RngCore, SeedableRng};
@@ -28,6 +29,12 @@ impl RngCore for SmallThreadRng {
     }
 }
 
+static GLOAB_TIME: AtomicU64 = AtomicU64::new(1);
+
+pub struct SampledLruPolicy {
+    last_used: AtomicU64,
+}
+
 // Structures implementing this trait are used to determine which buffer frame to evict.
 // It must ensure that multiple threads can safely update the internal states concurrently.
 pub trait EvictionPolicy: Send + Sync {
@@ -39,6 +46,29 @@ pub trait EvictionPolicy: Send + Sync {
         Self: Sized;
     fn update(&self);
     fn reset(&self);
+}
+
+impl EvictionPolicy for SampledLruPolicy {
+    fn new() -> Self {
+        SampledLruPolicy {
+            last_used: AtomicU64::new(0),
+        }
+    }
+
+    fn score(&self, _frame: &BufferFrame) -> u64 {
+        // lower == older == more eviction‐worthy
+        self.last_used.load(Ordering::Relaxed)
+    }
+
+    fn update(&self) {
+        let e = GLOAB_TIME.fetch_add(1, Ordering::Relaxed);
+        self.last_used.store(e, Ordering::Relaxed);
+    }
+
+    fn reset(&self) {
+        // on eviction / new page, clear history
+        self.last_used.store(0, Ordering::Relaxed);
+    }
 }
 
 pub struct DummyEvictionPolicy; // Used for in-memory pool

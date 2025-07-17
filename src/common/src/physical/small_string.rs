@@ -1,5 +1,5 @@
 use crate::ids::ContainerId;
-use crate::CrustyError;
+use crate::FairyError;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::fs::File;
@@ -108,7 +108,7 @@ impl StringManager {
         }
     }
 
-    pub fn shutdown(&self) -> Result<(), CrustyError> {
+    pub fn shutdown(&self) -> Result<(), FairyError> {
         info!("TODO: string manager shutdown is a stub");
         // TODO: if string manager state is required to be held across shutdown, then write a serialized
         //   struct version to disk and read from it in the new() method. See reservoir_stat_manager to
@@ -116,7 +116,7 @@ impl StringManager {
         Ok(())
     }
 
-    pub fn reset(&self) -> Result<(), CrustyError> {
+    pub fn reset(&self) -> Result<(), FairyError> {
         info!("TODO: string manager reset is a stub");
         // TODO: reset properly
         Ok(())
@@ -388,7 +388,7 @@ impl SmallString {
     }
 
     // XTX did deallocate instead, not sure if this is still necessary
-    pub fn delete(self) -> Result<(), CrustyError> {
+    pub fn delete(self) -> Result<(), FairyError> {
         // If is short prob don't need to do antyhing
         // If is long then deallocate
         Ok(())
@@ -572,12 +572,12 @@ impl SmallString {
     }
 
     /// Converts a small string to bytes, will also convert the suffix
-    pub fn as_bytes(&self) -> Result<Vec<u8>, CrustyError> {
+    pub fn as_bytes(&self) -> Result<Vec<u8>, FairyError> {
         let is_long = (self.flag_and_size & 0x80) != 0;
         if is_long {
             // First get the string using to_string()
             let string = self.to_string().map_err(|e| {
-                CrustyError::CrustyError(format!("Failed to convert SmallString to String: {}", e))
+                FairyError::FairyError(format!("Failed to convert SmallString to String: {}", e))
             })?;
 
             // Convert the entire string to bytes directly
@@ -593,10 +593,10 @@ impl SmallString {
     /// file_path: the path of the file to be saved to
     /// Returns: A result to the file path if the shutdown was successful
     #[allow(dead_code)]
-    fn shutdown(&self, file_path: PathBuf) -> Result<PathBuf, CrustyError> {
+    fn shutdown(&self, file_path: PathBuf) -> Result<PathBuf, FairyError> {
         let mut file = File::create(&file_path)?;
         let serialized = serde_json::to_string(self.string_manager)
-            .map_err(|e| CrustyError::CrustyError(format!("Failed serlializing: {}", e)))?;
+            .map_err(|e| FairyError::FairyError(format!("Failed serlializing: {}", e)))?;
         file.write_all(serialized.as_bytes())?;
         Ok(file_path)
     }
@@ -605,14 +605,14 @@ impl SmallString {
     /// Reads the contents of the file to populate a new StringManager
     /// file_path: the path of the file to be read
     #[allow(dead_code)]
-    fn startup(file_path: PathBuf, sm: &'static StringManager) -> Result<Self, CrustyError> {
+    fn startup(file_path: PathBuf, sm: &'static StringManager) -> Result<Self, FairyError> {
         let mut file = File::open(&file_path)?;
         let mut serialized = String::new();
         file.read_to_string(&mut serialized)?;
 
         // Create owned StringManager and move it into static storage
         let deserialized_manager: StringManager = serde_json::from_str(&serialized)
-            .map_err(|e| CrustyError::CrustyError(format!("Deserialization error: {}", e)))?;
+            .map_err(|e| FairyError::FairyError(format!("Deserialization error: {}", e)))?;
 
         // Store in static storage
         *sm.memory.write().unwrap() = deserialized_manager.memory.read().unwrap().clone();

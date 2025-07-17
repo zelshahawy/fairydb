@@ -3,7 +3,7 @@ use crate::Managers;
 use common::error::c_err;
 use common::query::bytecode_expr::ByteCodeExpr;
 
-use common::{CrustyError, Field, TableSchema, Tuple};
+use common::{FairyError, Field, TableSchema, Tuple};
 
 use std::cmp::{self, Ordering};
 
@@ -60,7 +60,7 @@ impl SortMergeJoin {
         right_expr: Vec<(ByteCodeExpr, bool)>,
         left_child: Box<dyn OpIterator>,
         right_child: Box<dyn OpIterator>,
-    ) -> Result<Self, CrustyError> {
+    ) -> Result<Self, FairyError> {
         if left_expr.len() != right_expr.len() {
             return Err(c_err(
                 "SMJ: Left and right expressions must have the same length",
@@ -100,7 +100,7 @@ impl OpIterator for SortMergeJoin {
         self.right_child.configure(false);
     }
 
-    fn open(&mut self) -> Result<(), CrustyError> {
+    fn open(&mut self) -> Result<(), FairyError> {
         if !self.open {
             if !self.left_child_read {
                 self.left_child.open()?;
@@ -162,7 +162,7 @@ impl OpIterator for SortMergeJoin {
         Ok(())
     }
 
-    fn next(&mut self) -> Result<Option<Tuple>, CrustyError> {
+    fn next(&mut self) -> Result<Option<Tuple>, FairyError> {
         if !self.open {
             panic!("Operator has not been opened")
         }
@@ -275,7 +275,7 @@ impl OpIterator for SortMergeJoin {
         }
     }
 
-    fn close(&mut self) -> Result<(), CrustyError> {
+    fn close(&mut self) -> Result<(), FairyError> {
         // Children operators are closed in open()
         self.r_first = 0;
         self.l_first = 0;
@@ -285,7 +285,7 @@ impl OpIterator for SortMergeJoin {
         Ok(())
     }
 
-    fn rewind(&mut self) -> Result<(), CrustyError> {
+    fn rewind(&mut self) -> Result<(), FairyError> {
         if !self.open {
             panic!("Operator has not been opened")
         }

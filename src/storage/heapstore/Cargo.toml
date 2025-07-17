@@ -1,12 +1,7 @@
 [package]
 name = "heapstore"
 version = "0.1.0"
-authors = [
-    "Aaron Elmore <aelmore@cs.uchicago.edu>",
-    "Raul Castro Fernandez <raulcf@uchicago.edu>",
-    "Daisy Barbanel", "Noah Banholzer",
-    "William Ma <williamma@uchicago.edu>",
-    "Riki Otaki"]
+authors = ["Ziad Elshahawy <zelshahawy@uchicago.edu>"]
 edition = "2021"
 
 [features]
@@ -32,7 +27,7 @@ tempfile = "3.16.0"
 common = { path = "../../common" }
 dashmap = "6.1"
 concurrent-queue = "2.5"
-libc = {version = "0.2.169"}
+libc = { version = "0.2.169" }
 
 [dev-dependencies]
 criterion = "0.5"

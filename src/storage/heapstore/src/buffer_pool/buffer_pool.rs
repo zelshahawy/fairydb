@@ -1,7 +1,9 @@
 use crate::buffer_pool::buffer_pool_stats::BPStats;
+use crate::buffer_pool::eviction_policy::SmallThreadRng;
 use crate::container_file_catalog::ContainerFileCatalog;
 use common::ids::{ContainerId, ContainerPageId, PageId};
 use common::rwlatch::RwLatch;
+use rand::RngCore;
 
 use super::{
     buffer_frame::{BufferFrame, FrameReadGuard, FrameWriteGuard},
@@ -170,11 +172,49 @@ impl BufferPool {
         self.latch.release_exclusive();
     }
 
-    /// Choose a frame to be evicted.
     fn choose_eviction_candidate(&self) -> Option<FrameWriteGuard> {
-        // 33550 ONLY
-        //TODO last milestone NOT hs
-        None
+        let frames = unsafe { &*self.frames.get() };
+        let len = frames.len();
+        if len == 0 {
+            return None;
+        }
+        let mut rng = SmallThreadRng;
+        let sample_size = 5.min(len);
+
+        // build a 0..len list and shuffle the first `sample_size` entries
+        let mut idxs: Vec<usize> = (0..len).collect();
+        if len > sample_size {
+            for i in 0..sample_size {
+                // pick a random j in [i, len)
+                let j = (rng.next_u64() as usize % (len - i)) + i;
+                idxs.swap(i, j);
+            }
+        }
+
+        let mut best: Option<FrameWriteGuard> = None;
+        let mut best_score = u64::MAX;
+
+        // now scan exactly `sample_size` distinct frames
+        for &idx in &idxs[..sample_size] {
+            if let Some(guard) = frames[idx].try_write(false) {
+                let sc = guard.evict_info().score(&frames[idx]);
+                if sc < best_score {
+                    // drop previous winner
+                    if let Some(prev) = best.take() {
+                        drop(prev);
+                    }
+                    best_score = sc;
+                    best = Some(guard);
+                }
+                // else: guard drops here, releasing the latch
+            }
+        }
+
+        // freshly reset the winner’s history
+        if let Some(ref g) = best {
+            g.evict_info().reset();
+        }
+        best
     }
 
     /// Choose a victim frame to be used for allocating a new page.

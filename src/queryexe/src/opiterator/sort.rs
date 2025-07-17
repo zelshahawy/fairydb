@@ -2,7 +2,7 @@ use super::OpIterator;
 use crate::Managers;
 use common::query::bytecode_expr::ByteCodeExpr;
 
-use common::{CrustyError, Field, TableSchema, Tuple};
+use common::{FairyError, Field, TableSchema, Tuple};
 
 use std::cmp::Ordering;
 
@@ -50,7 +50,7 @@ impl OpIterator for Sort {
         self.child.configure(false); // will_rewind is false for child because the sort is stateful and rewinding sort operator does not rewind child
     }
 
-    fn open(&mut self) -> Result<(), CrustyError> {
+    fn open(&mut self) -> Result<(), FairyError> {
         if !self.open {
             self.child.open()?;
             while let Some(tuple) = self.child.next()? {
@@ -85,7 +85,7 @@ impl OpIterator for Sort {
         Ok(())
     }
 
-    fn next(&mut self) -> Result<Option<Tuple>, CrustyError> {
+    fn next(&mut self) -> Result<Option<Tuple>, FairyError> {
         if !self.open {
             panic!("Operator has not been opened")
         }
@@ -109,7 +109,7 @@ impl OpIterator for Sort {
         }
     }
 
-    fn close(&mut self) -> Result<(), CrustyError> {
+    fn close(&mut self) -> Result<(), FairyError> {
         self.child.close()?;
         self.sorted_data.clear();
         self.index = 0;
@@ -117,7 +117,7 @@ impl OpIterator for Sort {
         Ok(())
     }
 
-    fn rewind(&mut self) -> Result<(), CrustyError> {
+    fn rewind(&mut self) -> Result<(), FairyError> {
         if !self.open {
             panic!("Operator has not been opened")
         }

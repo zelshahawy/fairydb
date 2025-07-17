@@ -13,7 +13,7 @@ use common::prelude::TransactionId;
 use common::traits::stat_manager_trait::StatManagerTrait;
 use common::traits::storage_trait::StorageTrait;
 use common::util::data_reader::{CsvReader, DataReader};
-use common::{CrustyError, QueryResult};
+use common::{FairyError, QueryResult};
 use env_logger::Env;
 use index::IndexManager;
 use queryexe::opiterator::OpIterator;
@@ -244,7 +244,7 @@ pub fn send_response(
     stream: &mut TcpStream,
     response: Response,
     quiet_mode: bool,
-) -> Result<(), CrustyError> {
+) -> Result<(), FairyError> {
     let response = if !quiet_mode {
         response
     } else {
@@ -259,7 +259,7 @@ pub fn send_response(
     };
     // xtx maybe update here so that I can have a variable number of queries coming in that can be configured but not sure how to handle cancel and restart
     let response_bytes = serde_cbor::to_vec(&response)
-        .map_err(|e| CrustyError::SerializationError(e.to_string()))?;
+        .map_err(|e| FairyError::SerializationError(e.to_string()))?;
     // TODO magic number - I  guess there is a potential issue of if the lenght is biggerthan u64 not sure if I need to deal with this
     let response_length = response_bytes.len() as u64;
     let response_length_bytes = response_length.to_be_bytes();
@@ -355,16 +355,16 @@ impl QueryEngine {
         self.database_state.catalog.get_table_id(table_name)
     }
 
-    pub fn run_sql(&mut self, sql: &str) -> Result<QueryResult, CrustyError> {
+    pub fn run_sql(&mut self, sql: &str) -> Result<QueryResult, FairyError> {
         self.conductor
             .run_sql_from_string(sql.to_string(), self.database_state)
     }
 
-    pub fn to_logical_plan(&mut self, sql: &str) -> Result<Query, CrustyError> {
+    pub fn to_logical_plan(&mut self, sql: &str) -> Result<Query, FairyError> {
         self.conductor.to_logical_plan(sql, self.database_state)
     }
 
-    pub fn to_physical_plan(&mut self, sql: &str) -> Result<PhysicalRelExpr, CrustyError> {
+    pub fn to_physical_plan(&mut self, sql: &str) -> Result<PhysicalRelExpr, FairyError> {
         let logical_plan = self.to_logical_plan(sql)?;
         self.conductor
             .to_physical_plan(logical_plan, self.database_state)
@@ -373,14 +373,14 @@ impl QueryEngine {
     pub fn run_physical_plan(
         &mut self,
         physical_plan: PhysicalRelExpr,
-    ) -> Result<QueryResult, CrustyError> {
+    ) -> Result<QueryResult, FairyError> {
         self.conductor
             .run_physical_plan(physical_plan, self.database_state)
     }
     pub fn run_opiterator(
         &mut self,
         opiterator: Box<dyn OpIterator>,
-    ) -> Result<QueryResult, CrustyError> {
+    ) -> Result<QueryResult, FairyError> {
         self.conductor.run_opiterator(opiterator)
     }
 
@@ -390,7 +390,7 @@ impl QueryEngine {
         delimiter: u8,
         has_header: bool,
         table_name: &str,
-    ) -> Result<usize, CrustyError>
+    ) -> Result<usize, FairyError>
     where
         R: Read,
     {

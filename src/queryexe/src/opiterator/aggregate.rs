@@ -3,7 +3,7 @@ use crate::Managers;
 #[allow(unused_imports)]
 use common::datatypes::f_decimal; // For generating a decimal field
 use common::query::bytecode_expr::ByteCodeExpr;
-use common::{AggOp, CrustyError, Field, TableSchema, Tuple};
+use common::{AggOp, FairyError, Field, TableSchema, Tuple};
 use std::cmp::{max, min};
 use std::collections::HashMap;
 
@@ -82,7 +82,7 @@ impl Aggregate {
     /// * `op` - Aggregation operation.
     /// * `field_val` - Current value of the field to add to the accumulation.
     /// * `acc` - Current accumulated value.
-    fn merge_fields(op: AggOp, field_val: &Field, acc: &mut Field) -> Result<(), CrustyError> {
+    fn merge_fields(op: AggOp, field_val: &Field, acc: &mut Field) -> Result<(), FairyError> {
         match op {
             AggOp::Count => *acc = (acc.clone() + Field::BigInt(1))?,
             AggOp::Max => {
@@ -154,7 +154,7 @@ impl OpIterator for Aggregate {
                                      // because aggregate will buffer all the tuples from the child
     }
 
-    fn open(&mut self) -> Result<(), CrustyError> {
+    fn open(&mut self) -> Result<(), FairyError> {
         if !self.open {
             // consume all input into acc
             self.child.open()?;
@@ -197,7 +197,7 @@ impl OpIterator for Aggregate {
         Ok(())
     }
 
-    fn next(&mut self) -> Result<Option<Tuple>, CrustyError> {
+    fn next(&mut self) -> Result<Option<Tuple>, FairyError> {
         if !self.open {
             panic!("Operator has not been opened")
         }
@@ -210,7 +210,7 @@ impl OpIterator for Aggregate {
         }
     }
 
-    fn close(&mut self) -> Result<(), CrustyError> {
+    fn close(&mut self) -> Result<(), FairyError> {
         if self.open {
             self.child.close()?;
             self.acc.clear();
@@ -221,7 +221,7 @@ impl OpIterator for Aggregate {
         Ok(())
     }
 
-    fn rewind(&mut self) -> Result<(), CrustyError> {
+    fn rewind(&mut self) -> Result<(), FairyError> {
         if !self.open {
             panic!("Operator has not been opened")
         }

@@ -1,6 +1,6 @@
-# CrustyDB: Page Debugging Guide
+# FairyDB: Page Debugging Guide
 
-Note this guide is a bit stale, so parts of the code / references might be out of 
+Note this guide is a bit stale, so parts of the code / references might be out of
 date, but the key ideas should still be useful.
 
 ## Overview
@@ -76,10 +76,10 @@ in the last line.
 
 We'll now parse in detail what each section of the code for this function does,
 both so you can understand and potentially use it again in other contexts in
-CrustyDB and so you can modify if you wish. The function that produces this
-starts on line 193 in `page.rs`. 
+FairyDB and so you can modify if you wish. The function that produces this
+starts on line 193 in `page.rs`.
 
-You can read more about how Rust formatting works for types [here](https://doc.rust-lang.org/std/fmt/index.html#formatting-traits), 
+You can read more about how Rust formatting works for types [here](https://doc.rust-lang.org/std/fmt/index.html#formatting-traits),
 but to format an object using the `?` operator, we must implement the `Debug`
 trait, hence: `impl fmt::Debug for Page`. To implement this trait, we must
 implement the `fmt` function.
@@ -105,11 +105,11 @@ As you implement `Page`, you will need to implement a header to manage free
 space. As this is still unimplemented, the tool doesn't print anything prior to
 the contents of the page. In line 200 we add a comment indicating where you
 should add code to print the contents of the header. This could include
-information such as the `PID` or the location of slots and slot IDs. 
+information such as the `PID` or the location of slots and slot IDs.
 
 This tool is not used in the tests so if you do not wish to use or do not wish
 to modify it, that's totally fine. However, adding in some code to print the
 headers of pages may be beneficial if you are running into bugs due to free
-space management, record deletion, or slot management. 
+space management, record deletion, or slot management.
 
 Happy debugging!

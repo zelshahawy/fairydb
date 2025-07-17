@@ -3,7 +3,7 @@ use crate::{physical::config::ServerConfig, prelude::*};
 // TODO: What does ContainerId add as a type? If nothing, then make it u16 and make it easier for clients of
 // TODO: storage managers to use them
 
-/// The trait for a storage manager in crustyDB.
+/// The trait for a storage manager in FairyDB.
 /// A StorageManager should impl Drop also so a storage manager can clean up on shut down and
 /// for testing storage managers to remove any state.
 /// Objects implementing this trait should guarantee that all
@@ -47,7 +47,7 @@ pub trait StorageTrait {
     ) -> Vec<ValueId>;
 
     /// Delete the data for a value. If the valueID is not found it returns Ok() still.
-    fn delete_value(&self, id: ValueId, tid: TransactionId) -> Result<(), CrustyError>;
+    fn delete_value(&self, id: ValueId, tid: TransactionId) -> Result<(), FairyError>;
 
     /// Updates a value. Returns record ID on update (which may have changed). Error on failure
     /// Any process that needs to determine if a value changed will need to compare the return valueId against
@@ -57,7 +57,7 @@ pub trait StorageTrait {
         value: Vec<u8>,
         id: ValueId,
         tid: TransactionId,
-    ) -> Result<ValueId, CrustyError>;
+    ) -> Result<ValueId, FairyError>;
 
     /// Create a new container to be stored.
     /// fn create_container(&self, name: String) -> ContainerId;
@@ -75,13 +75,13 @@ pub trait StorageTrait {
         name: Option<String>,
         container_type: StateType,
         dependencies: Option<Vec<ContainerId>>,
-    ) -> Result<(), CrustyError>;
+    ) -> Result<(), FairyError>;
 
-    fn create_table(&self, container_id: ContainerId) -> Result<(), CrustyError>;
+    fn create_table(&self, container_id: ContainerId) -> Result<(), FairyError>;
 
     /// Remove the container and all stored values in the container.
     /// If the container is persisted remove the underlying files
-    fn remove_container(&self, container_id: ContainerId) -> Result<(), CrustyError>;
+    fn remove_container(&self, container_id: ContainerId) -> Result<(), FairyError>;
 
     /// Get an iterator that returns all valid records
     fn get_iterator(
@@ -106,11 +106,11 @@ pub trait StorageTrait {
         id: ValueId,
         tid: TransactionId,
         perm: Permissions,
-    ) -> Result<Vec<u8>, CrustyError>;
+    ) -> Result<Vec<u8>, FairyError>;
 
     /// Reset all state associated the storage manager.
     /// Deletes all tables and stored items
-    fn reset(&self) -> Result<(), CrustyError>;
+    fn reset(&self) -> Result<(), FairyError>;
 
     /// for testing. clear anything cache in memory for performance
     fn clear_cache(&self);

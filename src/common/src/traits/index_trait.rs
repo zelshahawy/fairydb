@@ -11,5 +11,5 @@ pub trait IndexTrait {
         max_inclusive: bool,
     ) -> Vec<ValueId>;
 
-    fn add_values(value_ids: Vec<ValueId>, fields: Vec<Field>) -> Result<(), CrustyError>;
+    fn add_values(value_ids: Vec<ValueId>, fields: Vec<Field>) -> Result<(), FairyError>;
 }

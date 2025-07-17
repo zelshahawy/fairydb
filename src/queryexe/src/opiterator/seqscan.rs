@@ -5,7 +5,7 @@ use common::ids::{ContainerId, TransactionId};
 use common::prelude::ValueId;
 use common::query::bytecode_expr::ByteCodeExpr;
 use common::traits::storage_trait::StorageTrait;
-use common::{CrustyError, Field, TableSchema, Tuple};
+use common::{FairyError, Field, TableSchema, Tuple};
 
 /// Sequential scan operator
 pub struct SeqScan {
@@ -58,7 +58,7 @@ impl OpIterator for SeqScan {
         // do nothing
     }
 
-    fn open(&mut self) -> Result<(), CrustyError> {
+    fn open(&mut self) -> Result<(), FairyError> {
         if !self.open {
             self.file_iter = if let Some(index) = self.index {
                 Some(self.managers.sm.get_iterator_from(
@@ -79,7 +79,7 @@ impl OpIterator for SeqScan {
         Ok(())
     }
 
-    fn next(&mut self) -> Result<Option<Tuple>, CrustyError> {
+    fn next(&mut self) -> Result<Option<Tuple>, FairyError> {
         if !self.open {
             panic!("Operator has not been opened")
         }
@@ -90,6 +90,11 @@ impl OpIterator for SeqScan {
 
         for (bytes, id) in file_iter.by_ref() {
             // Create the tuple
+            println!(
+                "DEBUG: SeqScan.next() got bytes.len={} value_id={:?}",
+                bytes.len(),
+                id
+            );
             let mut tuple = Tuple::from_bytes(&bytes);
             tuple.value_id = Some(id);
             self.index = Some(id);
@@ -116,17 +121,18 @@ impl OpIterator for SeqScan {
                 return Ok(Some(tuple));
             }
         }
+        println!("DEBUG: SeqScan.next() → end of data");
         Ok(None)
     }
 
-    fn close(&mut self) -> Result<(), CrustyError> {
+    fn close(&mut self) -> Result<(), FairyError> {
         self.file_iter = None;
         self.index = None;
         self.open = false;
         Ok(())
     }
 
-    fn rewind(&mut self) -> Result<(), CrustyError> {
+    fn rewind(&mut self) -> Result<(), FairyError> {
         if !self.open {
             panic!("Operator has not been opened")
         }

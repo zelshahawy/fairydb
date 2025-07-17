@@ -35,14 +35,14 @@ impl<T: MemPool> HeapFile<T> {
     }
 
     /// Create a brand-new heap file for container `c_id`.
-    pub fn new(c_id: ContainerId, mem_pool: Arc<T>) -> Result<Self, CrustyError> {
+    pub fn new(c_id: ContainerId, mem_pool: Arc<T>) -> Result<Self, FairyError> {
         // Note that the header page is always page 0, and the data pages start from 1.
         // You may not end up using the header page, but some tests will assume this.
 
         // Add any extra initialization code in this function.
         let mut header = mem_pool
             .create_new_page_for_write(c_id)
-            .map_err(|_| CrustyError::StorageError)?;
+            .map_err(|_| FairyError::StorageError)?;
 
         header.init_heap_page();
 
@@ -55,10 +55,10 @@ impl<T: MemPool> HeapFile<T> {
     }
 
     /// Load an existing heap file.
-    pub fn load(c_id: ContainerId, mem_pool: Arc<T>) -> Result<Self, CrustyError> {
+    pub fn load(c_id: ContainerId, mem_pool: Arc<T>) -> Result<Self, FairyError> {
         let max_page = mem_pool
             .get_max_page_id(c_id)
-            .ok_or(CrustyError::StorageError)?;
+            .ok_or(FairyError::StorageError)?;
 
         let hf = HeapFile {
             c_id,
@@ -77,22 +77,22 @@ impl<T: MemPool> HeapFile<T> {
     }
 
     /// Read a value at (page_id, slot_id) from the heap file.
-    pub fn get_val(&self, page_id: PageId, slot_id: SlotId) -> Result<Vec<u8>, CrustyError> {
+    pub fn get_val(&self, page_id: PageId, slot_id: SlotId) -> Result<Vec<u8>, FairyError> {
         let page = self.get_page_for_read(page_id);
         page.get_value(slot_id)
             .map(|s| s.to_vec())
-            .ok_or(CrustyError::StorageError)
+            .ok_or(FairyError::StorageError)
     }
 
     // Delete a value at (page_id, slot_id) from the heap file.
-    pub fn delete_val(&self, page_id: PageId, slot_id: SlotId) -> Result<(), CrustyError> {
+    pub fn delete_val(&self, page_id: PageId, slot_id: SlotId) -> Result<(), FairyError> {
         if page_id == 0 || page_id > self.num_pages() {
-            return Err(CrustyError::StorageError);
+            return Err(FairyError::StorageError);
         }
         let mut frame = self.get_page_for_write(page_id);
         frame
             .delete_value(slot_id)
-            .ok_or(CrustyError::StorageError)?;
+            .ok_or(FairyError::StorageError)?;
         Ok(())
     }
 
@@ -101,7 +101,7 @@ impl<T: MemPool> HeapFile<T> {
         page_id: PageId,
         slot_id: SlotId,
         val: &[u8],
-    ) -> Result<ValueId, CrustyError> {
+    ) -> Result<ValueId, FairyError> {
         self.delete_val(page_id, slot_id)?;
         let new_vid = self.add_val(val)?;
         Ok(new_vid)
@@ -109,7 +109,7 @@ impl<T: MemPool> HeapFile<T> {
 
     // This function is not implemented in a thread-safe way. Can cause deadlocks when used in a multi-threaded environment.
     // We do not care about this for now.
-    pub fn add_val(&self, val: &[u8]) -> Result<ValueId, CrustyError> {
+    pub fn add_val(&self, val: &[u8]) -> Result<ValueId, FairyError> {
         let max_pid = self.num_pages();
         let last = self.last_insert_page.load(Ordering::Relaxed);
         if last > 0 && last <= max_pid {
@@ -130,9 +130,9 @@ impl<T: MemPool> HeapFile<T> {
         let mut new_frame = self
             .bp
             .create_new_page_for_write(self.c_id)
-            .map_err(|_| CrustyError::StorageError)?;
+            .map_err(|_| FairyError::StorageError)?;
         new_frame.init_heap_page();
-        let slot = new_frame.add_value(val).ok_or(CrustyError::StorageError)?;
+        let slot = new_frame.add_value(val).ok_or(FairyError::StorageError)?;
         let pid = new_frame.page_id().unwrap().page_id;
 
         // remember for next time
@@ -150,7 +150,7 @@ impl<T: MemPool> HeapFile<T> {
     pub fn add_vals(
         &self,
         iter: impl Iterator<Item = Vec<u8>>,
-    ) -> Result<Vec<ValueId>, CrustyError> {
+    ) -> Result<Vec<ValueId>, FairyError> {
         let mut val_ids = Vec::new();
         for val in iter {
             let val_id = self.add_val(&val)?;

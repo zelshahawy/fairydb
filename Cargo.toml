@@ -2,7 +2,7 @@
 resolver = "2"
 
 members = [
-    "src/cli-crusty",
+    "src/cli-fairy",
     "src/common",
     "src/index",
     "src/storage",
@@ -13,10 +13,7 @@ members = [
     "src/utilities",
 ]
 
-exclude = [
-    "e2e-benchmarks",
-    "e2e-tests",
-]
+exclude = ["e2e-benchmarks", "e2e-tests"]
 
 [profile.release]
 debug = true

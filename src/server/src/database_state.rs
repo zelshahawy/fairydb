@@ -84,7 +84,7 @@ impl DatabaseState {
         base_dir: &Path,
         db_name: &str,
         managers: &'static Managers,
-    ) -> Result<Self, CrustyError> {
+    ) -> Result<Self, FairyError> {
         let db_path = base_dir.join(db_name);
         if db_path.exists() {
             // this will no longer ever flag because db states are stored in base_dir/server_state.
@@ -95,7 +95,7 @@ impl DatabaseState {
         }
     }
 
-    pub fn new_from_name(db_name: &str, managers: &'static Managers) -> Result<Self, CrustyError> {
+    pub fn new_from_name(db_name: &str, managers: &'static Managers) -> Result<Self, FairyError> {
         let db_name: String = String::from(db_name);
         let db_id = DatabaseState::get_database_id(&db_name);
         debug!(
@@ -116,7 +116,7 @@ impl DatabaseState {
         Ok(db_state)
     }
 
-    pub fn load(filename: PathBuf, managers: &'static Managers) -> Result<Self, CrustyError> {
+    pub fn load(filename: PathBuf, managers: &'static Managers) -> Result<Self, FairyError> {
         let reader = fs::File::open(filename).expect("error opening db state file");
         let partial_db_state_info: SerializedDatabaseState =
             serde_json::from_reader(reader).expect("error reading from json");
@@ -139,12 +139,12 @@ impl DatabaseState {
         self.atomic_time.load(std::sync::atomic::Ordering::SeqCst)
     }
 
-    pub fn get_table_names(&self) -> Result<Vec<String>, CrustyError> {
+    pub fn get_table_names(&self) -> Result<Vec<String>, FairyError> {
         let tables = self.catalog.get_table_names();
         Ok(tables)
     }
 
-    pub fn get_registered_query_names(&self) -> Result<String, CrustyError> {
+    pub fn get_registered_query_names(&self) -> Result<String, FairyError> {
         self.query_registrar.get_registered_query_names()
     }
 
@@ -157,7 +157,7 @@ impl DatabaseState {
     pub fn load_database_from_file(
         _file: fs::File,
         _storage_manager: &StorageManager,
-    ) -> Result<CatalogRef, CrustyError> {
+    ) -> Result<CatalogRef, FairyError> {
         unimplemented!("Reconstruct the catalog from sm")
     }
 
@@ -172,13 +172,13 @@ impl DatabaseState {
         table_name: &str,
         columns: &[ColumnDef],
         constraints: &[TableConstraint],
-    ) -> Result<QueryResult, CrustyError> {
+    ) -> Result<QueryResult, FairyError> {
         // Constraints aren't implemented yet
 
         let table_id = self.catalog.get_table_id(table_name);
         let pks = match SQLParser::get_pks(columns, constraints) {
             Ok(pks) => pks,
-            Err(ParserResponse::SQLConstraintError(s)) => return Err(CrustyError::CrustyError(s)),
+            Err(ParserResponse::SQLConstraintError(s)) => return Err(FairyError::FairyError(s)),
             _ => unreachable!(),
         };
 
@@ -209,7 +209,7 @@ impl DatabaseState {
         let res = self.catalog.add_table(table_info);
         if res.is_none() {
             // TODO: This check should be done in the sm.
-            return Err(CrustyError::CrustyError(format!(
+            return Err(FairyError::FairyError(format!(
                 "Table {} already exists",
                 table_name
             )));
@@ -221,7 +221,7 @@ impl DatabaseState {
         Ok(qr)
     }
 
-    pub fn reset(&self) -> Result<(), CrustyError> {
+    pub fn reset(&self) -> Result<(), FairyError> {
         self.query_registrar.reset()?;
         // get rid of persisted query registrar info and reset
         let mut query_registrar_info_path = PathBuf::new();
@@ -248,7 +248,7 @@ impl DatabaseState {
     //     query_name: String,
     //     json_path: String,
     //     query_plan: Arc<PhysicalRelExpr>,
-    // ) -> Result<(), CrustyError> {
+    // ) -> Result<(), FairyError> {
     //     self.query_registrar
     //         .register_query(query_name, json_path, query_plan)
     // }
@@ -268,7 +268,7 @@ impl DatabaseState {
         query_plan: Arc<PhysicalRelExpr>,
         query_result_path: String,
         query_tid: TransactionId,
-    ) -> Result<(), CrustyError> {
+    ) -> Result<(), FairyError> {
         self.query_registrar.register_query_with_result(
             query_name,
             sql,
@@ -291,7 +291,7 @@ impl DatabaseState {
         query_name: &str,
         start_timestamp: Option<LogicalTimeStamp>,
         end_timestamp: LogicalTimeStamp,
-    ) -> Result<Arc<PhysicalRelExpr>, CrustyError> {
+    ) -> Result<Arc<PhysicalRelExpr>, FairyError> {
         let tm = self.managers.tm;
         self.query_registrar
             .begin_query(query_name, start_timestamp, end_timestamp, tm)
@@ -302,7 +302,7 @@ impl DatabaseState {
     /// # Arguments
     ///
     /// * `query_name` - Name of the query.
-    pub fn finish_query(&self, query_name: &str) -> Result<(), CrustyError> {
+    pub fn finish_query(&self, query_name: &str) -> Result<(), FairyError> {
         self.query_registrar.finish_query(query_name)
     }
 
@@ -312,7 +312,7 @@ impl DatabaseState {
     /// # Arguments
     ///
     /// * `sql` - sql string inputted by the user.
-    pub fn query_result_from_sql(&self, sql: &String) -> Result<Option<QueryResult>, CrustyError> {
+    pub fn query_result_from_sql(&self, sql: &String) -> Result<Option<QueryResult>, FairyError> {
         // get name from sql query
         let query_name = match self.query_registrar.get_query_name_from_sql(sql)? {
             Some(n) => n,

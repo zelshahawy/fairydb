@@ -1,7 +1,7 @@
 use super::OpIterator;
 use common::query::bytecode_expr::ByteCodeExpr;
 
-use common::{CrustyError, TableSchema, Tuple};
+use common::{FairyError, TableSchema, Tuple};
 
 /// Projection operator.
 pub struct Project {
@@ -29,7 +29,7 @@ impl OpIterator for Project {
         self.child.configure(will_rewind);
     }
 
-    fn open(&mut self) -> Result<(), CrustyError> {
+    fn open(&mut self) -> Result<(), FairyError> {
         if !self.open {
             self.child.open()?;
         }
@@ -37,7 +37,7 @@ impl OpIterator for Project {
         Ok(())
     }
 
-    fn next(&mut self) -> Result<Option<Tuple>, CrustyError> {
+    fn next(&mut self) -> Result<Option<Tuple>, FairyError> {
         if !self.open {
             panic!("Operator has not been opened")
         }
@@ -55,13 +55,13 @@ impl OpIterator for Project {
         Ok(None)
     }
 
-    fn close(&mut self) -> Result<(), CrustyError> {
+    fn close(&mut self) -> Result<(), FairyError> {
         self.child.close()?;
         self.open = false;
         Ok(())
     }
 
-    fn rewind(&mut self) -> Result<(), CrustyError> {
+    fn rewind(&mut self) -> Result<(), FairyError> {
         if !self.open {
             panic!("Operator has not been opened")
         }

@@ -9,21 +9,21 @@ use rand::{rng, Rng, SeedableRng};
 use std::env;
 
 pub fn get_rng() -> SmallRng {
-    match env::var("CRUSTY_SEED") {
+    match env::var("FAIRY_SEED") {
         Ok(seed_str) => match seed_str.parse::<u64>() {
             Ok(seed) => {
-                log::debug!("Using seed from CRUSTY_SEED: {}", seed);
+                log::debug!("Using seed from FAIRY_SEED: {}", seed);
                 SmallRng::seed_from_u64(seed)
             }
             Err(_) => {
                 let seed = rng().random::<u64>();
-                log::debug!("Failed to parse CRUSTY_SEED, using random seed: {}", seed);
+                log::debug!("Failed to parse FAIRY_SEED, using random seed: {}", seed);
                 SmallRng::seed_from_u64(seed)
             }
         },
         Err(_) => {
             let seed = rng().random::<u64>();
-            log::debug!("No CRUSTY_SEED provided, using random seed: {}", seed);
+            log::debug!("No FAIRY_SEED provided, using random seed: {}", seed);
             SmallRng::seed_from_u64(seed)
         }
     }

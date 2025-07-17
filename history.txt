@@ -1,18 +1,101 @@
 #V2
-\\l
-\\r
-dlfda
-sdsad
-sd
-s
-lee
 \\shutdown
-\\l
+\\r mydb
+\\r mydb1
+\\c mydb1
+cREATE TABLE users (id INTEGER PRIMARY KEY)
+\\r mydb
+\\c mydb
+cREATE TABLE users (id INTEGER PRIMARY KEY)
+INSERT INTO users VALUES (1)
+INSERT INTO users VALUES (2)
+INSERT INTO users VALUES (3)
+INSERT INTO users VALUES (4)
+INSERT INTO users VALUES (5)
+INSERT INTO users VALUES (6)
+INSERT INTO users VALUES (7)
+INSERT INTO users VALUES (8)
+ELECT * FROM users
+SELECT * FROM users
 \\shutdown
-\\r testdb 
-\\c testdb
-CREATE TABLE test (a INT, b INT, primary key (a));
-\\i ./data.csv test
-SELECT a FROM test;
-SELECT sum(a), sum(b) FROM test;
+\\r mydb
+\\c mydb
+INSERT INTO users VALUES (1),(2),(3),(4),(5),(6),(7),(8);
+\\r mydb
+\\r CREATE TABLE users (\n  id BIGINT PRIMARY KEY\n);
+INSERT INTO users VALUES (1),(2),(3),(4),(5),(6),(7),(8);
+\\c mydb
+CREATE TABLE users (\n  id BIGINT PRIMARY KEY\n);
+CREATE TABLE users (\n  id INTEGER PRIMARY KEY\n);
+INSERT INTO users VALUES (1),(2),(3),(4),(5),(6),(7),(8);
+cREATE TABLE RENS (\n  id INTEGER PRIMARY KEY\n);
+\\shutdown
+SELECT * FROM RENS
+\\c mydb
+SELECT * from RENS
+SELECT * from S
+\\shutdown
+\\r mydb
+\\c mydb
+INSERT INTO RENS VALUES (1), (2);
+/r mydb
+\\r mydb
+\\r mydb2
+\\c mydb
+CREATE TABLE users (id INTEGER PRIMARY KEY);
+>CREATE TABLE users (id INTEGER PRIMARY KEY);
+CREATE TABLE users (id INTEGER PRIMARY KEY);
+CREATE TABLE RENS (id INTEGER PRIMARY KEY);
+INSERT INTO users VALUES (1),(2)…;
+INSERT INTO users VALUES (1),(2);
+INSERT INTO RENS VALUES (1),(2);
+\\shutdown
+\\r mydb
+\\c mydb
+SELECT * FROM RENS;
+SELECT * FROM users'
+SELECT * FROM users;
+SELECT * FROM userss;
+\\r mydb
+\\c mydb
+CREATE TABLE users (\n  id INTEGER PRIMARY KEY\n);
+INSERT INTO users VALUES (1),(2),(3),(4),(5),(6),(7),(8);
+SELECT id FROM users
+SELECT * FROM users
+\\shutdown
+\\c mydb
+SELECT id FROM users
+SELECT * FROM users
+\\r mydb
+\\c mydb
+CREATE TABLE users (id INTEGERS PRIMARY KEY);
+CREATE TABLE users (id INTEGER PRIMARY KEY);
+INSERT VALUES INTO users (1),(2),(3),(4),(5),(6),(7),(8);
+INSERT INTO VALUES users (1),(2),(3),(4),(5),(6),(7),(8);
+INSERT INTO users VALUES (1),(2),(3),(4),(5),(6),(7),(8);
+SELECT * FROM users
+\\mydb
+\\r mydb
+SELECT * FROM users
+\\r mydb
+\\c mydb
+CREATE TABLE USERS (id INTEGERS PRIMARY KEY);
+CREATE TABLE USERS (id INTEGER PRIMARY KEY);
+INSERT INTO users VALUES (1),(2),(3),(4),(5),(6),(7),(8);
+\\r mydb
+\\c mydb
+CREATE TABLE USERS (id INTEGERS PRIMARY KEY);
+CREATE TABLE USERS (id INTEGER PRIMARY KEY);
+INSERT INTO USERS VALUES (1),(2),(3),(4),(5),(6),(7),(8);
+SELECT * FROM USERS
+\\shutdown
+\\d
+/d
+\\r mydb
+\\c mydb
+CREATE TABLE users (id INTEGER PRIMARY KEY, name VARCHAR(255));
+INSERT INTO users VALUES (1, 'alice');
+SELECT * FROM users;
+INSERT INTO users VALUES (110, 'greg');
+SELECT * FROM users;
 \\shutdown

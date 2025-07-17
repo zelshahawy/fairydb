@@ -1,4 +1,4 @@
-use crate::{CrustyError, TableSchema, Tuple};
+use crate::{FairyError, TableSchema, Tuple};
 
 use super::tuple_writer::TupleConverterTrait;
 
@@ -22,7 +22,7 @@ impl TupleConverterTrait for TupleConverter2 {
         Some(bytes.len())
     }
 
-    fn read_tuple(&self, buf: &[u8], offset: usize, len: usize) -> Result<Tuple, CrustyError> {
+    fn read_tuple(&self, buf: &[u8], offset: usize, len: usize) -> Result<Tuple, FairyError> {
         let t = Tuple::from_bytes(buf[offset..offset + len].as_ref());
         Ok(t)
     }
