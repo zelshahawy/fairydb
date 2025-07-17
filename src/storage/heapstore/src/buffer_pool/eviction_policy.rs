@@ -1,8 +1,7 @@
-use std::cell::RefCell;
-use std::sync::atomic::{self, AtomicU64, Ordering};
-
 use rand::rngs::SmallRng;
 use rand::{RngCore, SeedableRng};
+use std::cell::RefCell;
+use std::sync::atomic::{AtomicU64, Ordering};
 
 use super::buffer_frame::BufferFrame;
 
