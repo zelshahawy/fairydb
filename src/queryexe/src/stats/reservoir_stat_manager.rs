@@ -248,12 +248,12 @@ impl StatManagerTrait for ReservoirStatManager {
             .collect::<Result<Vec<ByteCodeExpr>, FairyError>>()?;
 
         let samples = self.samples.read().unwrap();
-        let left_container_samples = samples.get(&left_c_id).ok_or(FairyError::FairyError(
-            "Container 1 not found".to_string(),
-        ))?;
-        let right_container_samples = samples.get(&right_c_id).ok_or(FairyError::FairyError(
-            "Container 2 not found".to_string(),
-        ))?;
+        let left_container_samples = samples
+            .get(&left_c_id)
+            .ok_or(FairyError::FairyError("Container 1 not found".to_string()))?;
+        let right_container_samples = samples
+            .get(&right_c_id)
+            .ok_or(FairyError::FairyError("Container 2 not found".to_string()))?;
 
         if left_container_samples.samples.is_empty() || right_container_samples.samples.is_empty() {
             return Ok((0, 0.0));

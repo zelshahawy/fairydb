@@ -34,6 +34,7 @@ pub struct BaseFile {
 }
 
 impl BaseFile {
+    #[allow(dead_code)]
     pub fn new<P: AsRef<std::path::Path>>(
         db_dir: P,
         c_id: ContainerId,

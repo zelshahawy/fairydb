@@ -24,13 +24,18 @@ pub struct PageToFrame {
     map: HashMap<ContainerId, HashMap<PageId, usize>>, // (c_key, page_id) -> frame_index
 }
 
+impl Default for PageToFrame {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PageToFrame {
     pub fn new() -> Self {
         PageToFrame {
             map: HashMap::new(),
         }
     }
-
     pub fn contains_key(&self, p_key: &ContainerPageId) -> bool {
         self.map
             .get(&p_key.c_id)

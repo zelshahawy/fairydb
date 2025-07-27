@@ -19,7 +19,7 @@ use common::{
     AggOp, BinaryOp,
 };
 use common::{logical_expr::prelude::LogicalRelExpr, Field};
-use common::{FairyError, DataType};
+use common::{DataType, FairyError};
 use sqlparser::ast::{self, ExactNumberInfo};
 
 /// Retrieve the name from the command parser object.
