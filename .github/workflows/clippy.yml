@@ -17,14 +17,14 @@ concurrency:
 
 jobs:
   check:
-    name: Check (fmt + clippy + cargo check)
+    name: Check (fmt + clippy + check)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 :contentReference[oaicite:1]{index=1}
+        uses: actions/checkout@v5
 
       - name: Cache Cargo Registry and Target
-        uses: actions/cache@v5 :contentReference[oaicite:2]{index=2}
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cargo/registry
@@ -35,7 +35,7 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Install Rust Stable Toolchain (clippy + rustfmt)
-        uses: dtolnay/rust-toolchain@stable :contentReference[oaicite:3]{index=3}
+        uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy,rustfmt
 
@@ -56,16 +56,17 @@ jobs:
 
   autofix_pr:
     name: Auto-fix and open PR
+    # Don’t try to auto-push changes on PR events
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (full history)
-        uses: actions/checkout@v6 :contentReference[oaicite:4]{index=4}
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Cache Cargo Registry and Target
-        uses: actions/cache@v5 :contentReference[oaicite:5]{index=5}
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cargo/registry
@@ -76,26 +77,28 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Install Rust Stable Toolchain (clippy + rustfmt)
-        uses: dtolnay/rust-toolchain@stable :contentReference[oaicite:6]{index=6}
+        uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy,rustfmt
 
       - name: Apply rustfmt
         run: cargo fmt --all
 
+      # These two try to apply whatever clippy can safely auto-fix.
+      # If some lints are not auto-fixable, we still want to open a PR for the ones that were.
       - name: Apply clippy auto-fixes (no default features)
         continue-on-error: true
-        run: cargo clippy --fix --allow-dirty --allow-staged --workspace --all-targets --no-default-features :contentReference[oaicite:7]{index=7}
+        run: cargo clippy --fix --allow-dirty --allow-staged --workspace --all-targets --no-default-features
 
       - name: Apply clippy auto-fixes (all features)
         continue-on-error: true
-        run: cargo clippy --fix --allow-dirty --allow-staged --workspace --all-targets --all-features :contentReference[oaicite:8]{index=8}
+        run: cargo clippy --fix --allow-dirty --allow-staged --workspace --all-targets --all-features
 
       - name: Re-run rustfmt after fixes
         run: cargo fmt --all
 
       - name: Create pull request with fixes
-        uses: peter-evans/create-pull-request@v7 :contentReference[oaicite:9]{index=9}
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: ci/rust-lint-fixes
@@ -108,5 +111,3 @@ jobs:
             It applies:
             - cargo fmt --all
             - cargo clippy --fix (where possible)
-
-            After merging, CI should be clean.
