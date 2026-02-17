@@ -49,7 +49,7 @@ impl BufferFrame {
         self.is_dirty.load(Ordering::Relaxed)
     }
 
-    pub fn read(&self) -> FrameReadGuard {
+    pub fn read(&self) -> FrameReadGuard<'_> {
         self.latch.shared();
         FrameReadGuard {
             upgraded: AtomicBool::new(false),
@@ -57,7 +57,7 @@ impl BufferFrame {
         }
     }
 
-    pub fn try_read(&self) -> Option<FrameReadGuard> {
+    pub fn try_read(&self) -> Option<FrameReadGuard<'_>> {
         if self.latch.try_shared() {
             Some(FrameReadGuard {
                 upgraded: AtomicBool::new(false),
@@ -69,7 +69,7 @@ impl BufferFrame {
     }
 
     #[allow(dead_code)]
-    pub fn write(&self, make_dirty: bool) -> FrameWriteGuard {
+    pub fn write(&self, make_dirty: bool) -> FrameWriteGuard<'_> {
         self.latch.exclusive();
         if make_dirty {
             self.is_dirty.store(true, Ordering::Release);
@@ -80,7 +80,7 @@ impl BufferFrame {
         }
     }
 
-    pub fn try_write(&self, make_dirty: bool) -> Option<FrameWriteGuard> {
+    pub fn try_write(&self, make_dirty: bool) -> Option<FrameWriteGuard<'_>> {
         if self.latch.try_exclusive() {
             if make_dirty {
                 self.is_dirty.store(true, Ordering::Release);

@@ -21,14 +21,14 @@ pub(crate) struct HeapFile<T: MemPool> {
 /// HeapFile required functions
 impl<T: MemPool> HeapFile<T> {
     /// Helper function to fetch a page for read from the buffer pool.
-    fn get_page_for_read(&self, page_id: PageId) -> FrameReadGuard {
+    fn get_page_for_read(&self, page_id: PageId) -> FrameReadGuard<'_> {
         self.bp
             .get_page_for_read(PageFrameId::new(self.c_id, page_id))
             .unwrap()
     }
 
     /// Helper function to fetch a page for write from the buffer pool.
-    fn get_page_for_write(&self, page_id: PageId) -> FrameWriteGuard {
+    fn get_page_for_write(&self, page_id: PageId) -> FrameWriteGuard<'_> {
         self.bp
             .get_page_for_write(PageFrameId::new(self.c_id, page_id))
             .unwrap()

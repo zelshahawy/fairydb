@@ -119,8 +119,7 @@ impl BaseFileTrait for BaseFile {
         }
 
         if ret as usize != to_read {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
+            return Err(std::io::Error::other(
                 "Failed to read the expected amount of data",
             ));
         }

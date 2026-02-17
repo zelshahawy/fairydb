@@ -48,10 +48,7 @@ fn parse_ops<P: AsRef<std::path::Path>>(path: P) -> io::Result<Vec<Op>> {
 
         // SAFETY: log lines are trusted ASCII; parsing errors -> panic
         let c_id = scan_number(&line, "c:").expect("missing c:");
-        let p_id = match scan_number(&line, "p:") {
-            Some(id) => id,
-            None => u32::MAX, // create
-        };
+        let p_id = scan_number(&line, "p:").unwrap_or(u32::MAX);
 
         vec.push((opcode, c_id, p_id));
     }

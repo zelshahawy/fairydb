@@ -66,11 +66,7 @@ impl TransactionManagerTrait for MockTransactionManager {
         Ok(())
     }
 
-    fn pre_insert_record(
-        &self,
-        _tuple: &mut Tuple,
-        _tid: TransactionId,
-    ) -> Result<(), FairyError> {
+    fn pre_insert_record(&self, _tuple: &mut Tuple, _tid: TransactionId) -> Result<(), FairyError> {
         Ok(())
     }
 
