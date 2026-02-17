@@ -258,8 +258,8 @@ pub fn send_response(
         }
     };
     // xtx maybe update here so that I can have a variable number of queries coming in that can be configured but not sure how to handle cancel and restart
-    let response_bytes = serde_cbor::to_vec(&response)
-        .map_err(|e| FairyError::SerializationError(e.to_string()))?;
+    let response_bytes =
+        serde_cbor::to_vec(&response).map_err(|e| FairyError::SerializationError(e.to_string()))?;
     // TODO magic number - I  guess there is a potential issue of if the lenght is biggerthan u64 not sure if I need to deal with this
     let response_length = response_bytes.len() as u64;
     let response_length_bytes = response_length.to_be_bytes();

@@ -49,7 +49,7 @@ pub trait MemPool: Sync + Send {
     fn create_new_page_for_write(
         &self,
         c_id: ContainerId,
-    ) -> Result<FrameWriteGuard, MemPoolStatus>;
+    ) -> Result<FrameWriteGuard<'_>, MemPoolStatus>;
 
     /// Create new pages for write.
     /// This function will allocate multiple new pages in memory and return a list of FrameWriteGuard.
@@ -64,7 +64,7 @@ pub trait MemPool: Sync + Send {
         &self,
         c_id: ContainerId,
         num_pages: usize,
-    ) -> Result<Vec<FrameWriteGuard>, MemPoolStatus>;
+    ) -> Result<Vec<FrameWriteGuard<'_>>, MemPoolStatus>;
 
     /// Check if a page is cached in the memory pool.
     /// This function will return true if the page is in memory, false otherwise.
@@ -85,12 +85,12 @@ pub trait MemPool: Sync + Send {
     /// Get a page for write.
     /// This function will return a FrameWriteGuard.
     /// This function assumes that a page is already created and either in memory or on disk.
-    fn get_page_for_write(&self, key: PageFrameId) -> Result<FrameWriteGuard, MemPoolStatus>;
+    fn get_page_for_write(&self, key: PageFrameId) -> Result<FrameWriteGuard<'_>, MemPoolStatus>;
 
     /// Get a page for read.
     /// This function will return a FrameReadGuard.
     /// This function assumes that a page is already created and either in memory or on disk.
-    fn get_page_for_read(&self, key: PageFrameId) -> Result<FrameReadGuard, MemPoolStatus>;
+    fn get_page_for_read(&self, key: PageFrameId) -> Result<FrameReadGuard<'_>, MemPoolStatus>;
 
     /// Prefetch page
     /// Load the page into memory so that read access will be faster.

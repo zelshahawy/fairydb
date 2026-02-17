@@ -24,6 +24,12 @@ pub struct PageToFrame {
     map: HashMap<ContainerId, HashMap<PageId, usize>>, // (c_key, page_id) -> frame_index
 }
 
+impl Default for PageToFrame {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PageToFrame {
     pub fn new() -> Self {
         PageToFrame {
@@ -172,7 +178,7 @@ impl BufferPool {
         self.latch.release_exclusive();
     }
 
-    fn choose_eviction_candidate(&self) -> Option<FrameWriteGuard> {
+    fn choose_eviction_candidate(&self) -> Option<FrameWriteGuard<'_>> {
         let frames = unsafe { &*self.frames.get() };
         let len = frames.len();
         if len == 0 {
@@ -219,7 +225,7 @@ impl BufferPool {
 
     /// Choose a victim frame to be used for allocating a new page.
     /// If all the frames are latched, then return None.
-    fn choose_victim(&self) -> Option<FrameWriteGuard> {
+    fn choose_victim(&self) -> Option<FrameWriteGuard<'_>> {
         let frames = unsafe { &*self.frames.get() };
 
         // First, try the eviction hints
@@ -238,7 +244,7 @@ impl BufferPool {
     /// Choose multiple victim frames to be used for allocating new pages.
     /// The returned vector may contain fewer frames thant he requested number of victims.
     /// It can also return an empty vector.
-    fn choose_victims(&self, num_victims: usize) -> Vec<FrameWriteGuard> {
+    fn choose_victims(&self, num_victims: usize) -> Vec<FrameWriteGuard<'_>> {
         let frames = unsafe { &*self.frames.get() };
         let num_victims = frames.len().min(num_victims);
         let mut victims = Vec::with_capacity(num_victims);
@@ -334,7 +340,7 @@ impl MemPool for BufferPool {
     fn create_new_page_for_write(
         &self,
         c_key: ContainerId,
-    ) -> Result<FrameWriteGuard, MemPoolStatus> {
+    ) -> Result<FrameWriteGuard<'_>, MemPoolStatus> {
         self.stats.inc_new_page();
 
         // 1. Choose victim
@@ -382,7 +388,7 @@ impl MemPool for BufferPool {
         &self,
         c_key: ContainerId,
         num_pages: usize,
-    ) -> Result<Vec<FrameWriteGuard>, MemPoolStatus> {
+    ) -> Result<Vec<FrameWriteGuard<'_>>, MemPoolStatus> {
         assert!(num_pages > 0);
         self.stats.inc_new_pages(num_pages);
 
@@ -473,7 +479,7 @@ impl MemPool for BufferPool {
         keys
     }
 
-    fn get_page_for_write(&self, key: PageFrameId) -> Result<FrameWriteGuard, MemPoolStatus> {
+    fn get_page_for_write(&self, key: PageFrameId) -> Result<FrameWriteGuard<'_>, MemPoolStatus> {
         self.stats.inc_write_count();
 
         // #[cfg(not(feature = "no_bp_hint"))]
@@ -580,7 +586,7 @@ impl MemPool for BufferPool {
         }
     }
 
-    fn get_page_for_read(&self, key: PageFrameId) -> Result<FrameReadGuard, MemPoolStatus> {
+    fn get_page_for_read(&self, key: PageFrameId) -> Result<FrameReadGuard<'_>, MemPoolStatus> {
         self.stats.inc_read_count();
 
         // #[cfg(not(feature = "no_bp_hint"))]

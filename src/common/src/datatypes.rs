@@ -484,9 +484,9 @@ impl Field {
                 field
             )));
         }
-        let integer = parts[0].parse::<i64>().map_err(|_| {
-            FairyError::ValidationError(format!("Invalid decimal field {}", field))
-        })?;
+        let integer = parts[0]
+            .parse::<i64>()
+            .map_err(|_| FairyError::ValidationError(format!("Invalid decimal field {}", field)))?;
 
         // Check the integer part
         if integer.abs() >= 10i64.pow(p - s) {
