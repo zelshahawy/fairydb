@@ -434,13 +434,13 @@ mod tests {
             left: Box::new(Expression::<PhysicalRelExpr>::ColRef { id: 1 }), // Referring to "ia1"
             right: Box::new(Expression::<PhysicalRelExpr>::Field { val: f1.to_owned() }),
         };
-        let estimated_count_res = stat_manager.estimate_count_and_sel(2, &[predicate.clone()]);
+        let estimated_count_res = stat_manager.estimate_count_and_sel(2, std::slice::from_ref(&predicate));
         assert_eq!(
             estimated_count_res,
             Err(FairyError::FairyError("Container not found".to_string()))
         );
 
-        let estimated_count_res = stat_manager.estimate_count_and_sel(c_id, &[predicate.clone()]);
+        let estimated_count_res = stat_manager.estimate_count_and_sel(c_id, std::slice::from_ref(&predicate));
         assert_eq!(estimated_count_res, Ok((0, 0.0)));
         stat_manager.new_record(tuple, ValueId::new(c_id)).unwrap();
         let (estimated_count, _) = stat_manager

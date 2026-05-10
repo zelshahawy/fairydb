@@ -60,7 +60,7 @@ impl ServerConfig {
     }
 
     pub fn temporary() -> Self {
-        let base_dir = tempfile::tempdir().unwrap().into_path();
+        let base_dir = tempfile::tempdir().unwrap().keep();
         ServerConfig {
             db_path: base_dir,
             ..ServerConfig::default()

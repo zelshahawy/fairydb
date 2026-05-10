@@ -155,15 +155,15 @@ impl ValueId {
             // bit_flag |= 0b00000100;
             panic!("TODO no segment supported");
         }
-        if self.page_id.is_some() {
+        if let Some(page_id) = self.page_id {
             bit_flag |= 0b00000010;
             offset += PID_SIZE;
-            vb[offset - PID_SIZE..offset].copy_from_slice(&self.page_id.unwrap().to_le_bytes());
+            vb[offset - PID_SIZE..offset].copy_from_slice(&page_id.to_le_bytes());
         }
-        if self.slot_id.is_some() {
+        if let Some(slot_id) = self.slot_id {
             bit_flag |= 0b00000001;
             offset += SID_SIZE;
-            vb[offset - SID_SIZE..offset].copy_from_slice(&self.slot_id.unwrap().to_le_bytes());
+            vb[offset - SID_SIZE..offset].copy_from_slice(&slot_id.to_le_bytes());
         }
         vb[0] = bit_flag;
         vb
@@ -239,14 +239,14 @@ impl ValueId {
         bytes.push(bit_flag);
         // bytes.push(0);
         bytes.extend_from_slice(&self.container_id.to_le_bytes());
-        if self.segment_id.is_some() {
-            bytes.extend_from_slice(&self.segment_id.unwrap().to_le_bytes());
+        if let Some(segment_id) = self.segment_id {
+            bytes.extend_from_slice(&segment_id.to_le_bytes());
         }
-        if self.page_id.is_some() {
-            bytes.extend_from_slice(&self.page_id.unwrap().to_le_bytes());
+        if let Some(page_id) = self.page_id {
+            bytes.extend_from_slice(&page_id.to_le_bytes());
         }
-        if self.slot_id.is_some() {
-            bytes.extend_from_slice(&self.slot_id.unwrap().to_le_bytes());
+        if let Some(slot_id) = self.slot_id {
+            bytes.extend_from_slice(&slot_id.to_le_bytes());
         }
         bytes
     }
@@ -255,17 +255,17 @@ impl ValueId {
 impl fmt::Debug for ValueId {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf: String = format!("<c_id:{}", self.container_id);
-        if self.segment_id.is_some() {
+        if let Some(segment_id) = self.segment_id {
             buf.push_str(",seg_id:");
-            buf.push_str(&self.segment_id.unwrap().to_string());
+            buf.push_str(&segment_id.to_string());
         }
-        if self.page_id.is_some() {
+        if let Some(page_id) = self.page_id {
             buf.push_str(",p_id:");
-            buf.push_str(&self.page_id.unwrap().to_string());
+            buf.push_str(&page_id.to_string());
         }
-        if self.slot_id.is_some() {
+        if let Some(slot_id) = self.slot_id {
             buf.push_str(",slot_id:");
-            buf.push_str(&self.slot_id.unwrap().to_string());
+            buf.push_str(&slot_id.to_string());
         }
         buf.push('>');
         write!(f, "{}", buf)

@@ -439,7 +439,7 @@ mod test {
 
         #[test]
         fn test_run_sql() {
-            let base_dir = tempfile::tempdir().unwrap().into_path();
+            let base_dir = tempfile::tempdir().unwrap().keep();
             let mut query_engine = QueryEngine::new(&base_dir);
             // create table with primary key
             let sql = "CREATE TABLE foo (id INT PRIMARY KEY, name VARCHAR(10));";
@@ -461,7 +461,7 @@ mod test {
 
         #[test]
         fn test_load_csv_and_run_sql() {
-            let base_dir = tempfile::tempdir().unwrap().into_path();
+            let base_dir = tempfile::tempdir().unwrap().keep();
             let mut query_engine = QueryEngine::new(&base_dir);
             // create table with primary key
             let sql = "CREATE TABLE foo (id INT PRIMARY KEY, name VARCHAR(10));";
