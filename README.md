@@ -3,7 +3,29 @@ FairyDB is a SQL‑compliant, high‑performance OLTP storage engine written in 
 It provides a lightweight, heap‑file based storage layer with a buffer‑pool backed page allocator designed for low‑latency
 transactional workloads.
 
-## Usage
+## Example
+`cargo run --bin server` to initialize the server
+`cargo run --bin cli-fairy` to initialize the cli <in another shell>
+
+in the CLI, try the following!
+
+```sql
+\r mydb -- Creates a new database called mydb
+\c mydb -- Connects to the mydb database
+
+CREATE TABLE users (id INTEGER PRIMARY KEY, name VARCHAR(255)); -- Creates a new table named users
+
+-- Inserts some values to the table
+INSERT INTO users VALUES (1, 'alice');
+INSERT INTO users VALUES (2, 'Ziad');
+INSERT INTO users VALUES (3, 'Ahmed');
+
+-- Queries the users table
+SELECT * FROM users;
+
+```
+
+## Usage and Installation
 
 Make sure you have Rust > 1.81.0. Updating the rust toolkit is pretty easy, just do:
 

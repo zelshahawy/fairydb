@@ -1,16 +1,5 @@
 #V2
 \\r mydb
-\\r mydb2
-\\c mydb
-CREATE TABLE users (id INTEGER PRIMARY KEY);
->CREATE TABLE users (id INTEGER PRIMARY KEY);
-CREATE TABLE users (id INTEGER PRIMARY KEY);
-CREATE TABLE RENS (id INTEGER PRIMARY KEY);
-INSERT INTO users VALUES (1),(2)…;
-INSERT INTO users VALUES (1),(2);
-INSERT INTO RENS VALUES (1),(2);
-\\shutdown
-\\r mydb
 \\c mydb
 SELECT * FROM RENS;
 SELECT * FROM users'
@@ -98,4 +87,15 @@ SELECT * FROM users;
 SELECT * FROM users;
 \\c mydb
 SELECT * FROM users;
+\\shutdown
+CREATE DATABASE MyStore;
+\\r mydb
+\\c mydb
+CREATE TABLE users (id INTEGER PRIMARY KEY, name VARCHAR(255)); # Creates a dummy table for your database
+CREATE TABLE users (id INTEGER PRIMARY KEY, name VARCHAR(255));
+INSERT INTO users (id, name) \nVALUES (1, 'Jane Doe');
+INSERT INTO users VALUES (1, 'alice');
+INSERT INTO users VALUES (2, 'Ziad');
+INSERT INTO users VALUES (3, 'Ahmed');
+SELECT * FROM users; 
 \\shutdown
