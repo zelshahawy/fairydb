@@ -36,7 +36,6 @@ impl PageToFrame {
             map: HashMap::new(),
         }
     }
-
     pub fn contains_key(&self, p_key: &ContainerPageId) -> bool {
         self.map
             .get(&p_key.c_id)
