@@ -54,7 +54,7 @@ cargo 1.82.0
 ## Building project
 To build the entire fairyDB source code, you would run `cargo build`
 
-fairyDB is set up as a workspace and various modules/components of the database are broken into separate packages/crates. To build a specific crate (for example common), you would use the following command `cargo build -p common`. Note if a package/crate depends on another crate (e.g. heapstore depends on common and txn_manager) those crates will be built as part of the process. **Note that for the first milestone you will only have access to common and limited part of heapstore.**
+fairyDB is set up as a workspace and various modules/components of the database are broken into separate packages/crates. To build a specific crate (for example common), you would use the following command `cargo build -p common`. Note if a package/crate depends on another crate (e.g. heapstore depends on common and txn_manager) those crates will be built as part of the process.
 
 
 These crates are:
