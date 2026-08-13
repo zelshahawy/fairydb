@@ -37,13 +37,13 @@ impl StorageTrait for StorageManager {
         if storage_dir.exists() {
             info!(
                 "Initializing memstore::storage_manager from path: {:?}",
-                &storage_dir
+                storage_dir
             );
             StorageManager::load(&storage_dir)
         } else {
             info!(
                 "Creating new memstore::storage_manager with path: {:?}",
-                &storage_dir
+                storage_dir
             );
             StorageManager {
                 containers: Arc::new(RwLock::new(HashMap::new())),
@@ -94,7 +94,7 @@ impl StorageTrait for StorageManager {
         };
         debug!(
             "memstore:storage_manager insert key: {:?} value: {:?}",
-            &rid, &value
+            rid, value
         );
         vals.insert(rid, value);
         last_insert.insert(container_id, rid);
@@ -165,20 +165,19 @@ impl StorageTrait for StorageManager {
         }
 
         if dependencies.is_some() {
-            //FIXME add meta tracking
             unimplemented!();
         }
         let mut containers = self.containers.write().unwrap();
         if containers.contains_key(&container_id) {
             debug!(
                 "memstore::create_container container_id: {:?} already exists",
-                &container_id
+                container_id
             );
             return Ok(());
         }
         debug!(
             "memstore::create_container container_id: {:?} does not exist yet",
-            &container_id
+            container_id
         );
         containers.insert(container_id, Arc::new(RwLock::new(HashMap::new())));
         Ok(())
@@ -195,13 +194,13 @@ impl StorageTrait for StorageManager {
         if !containers.contains_key(&container_id) {
             debug!(
                 "memstore::remove_container container_id: {:?} does not exist",
-                &container_id
+                container_id
             );
             return Ok(());
         }
         debug!(
             "memstore::remove_container container_id: {:?} exists. dropping",
-            &container_id
+            container_id
         );
         containers.remove(&container_id).unwrap();
         Ok(())
@@ -222,7 +221,7 @@ impl StorageTrait for StorageManager {
             .unwrap()
             .clone();
         let last_insert = self.last_insert.read().unwrap();
-        debug!("memstore::get_iterator container_id: {:?}", &container_id);
+        debug!("memstore::get_iterator container_id: {:?}", container_id);
         let max = last_insert
             .get(&container_id)
             .unwrap_or(&ValueId::new(container_id))
