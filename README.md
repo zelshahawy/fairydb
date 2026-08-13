@@ -156,8 +156,6 @@ whatever database the client is currently connected to.
 `\close` | Closes the current client, but leaves the database server running
 `\shutdown` |  Shuts down the database server cleanly (allows the DB to gracefully exit)
 
-There are other commands you can ignore for this class (register, runFull, runPartial, convert).
-
 The client also handles basic SQL queries.
 
 ## End to End Example
