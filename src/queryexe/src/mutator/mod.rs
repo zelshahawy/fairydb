@@ -83,7 +83,7 @@ pub(crate) fn validate_tuples(
                     // Nothing for now
                 }
                 _ => {
-                    debug!("Wrong field: {} for attr type: {}", field, &attr.dtype);
+                    debug!("Wrong field: {} for attr type: {}", field, attr.dtype);
                     values_to_remove.push((i, vec![ConversionError::WrongType]));
                 }
             }

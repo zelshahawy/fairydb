@@ -165,7 +165,7 @@ impl Client {
                         resp
                     }
                     _ => {
-                        info!("Received response: {:?}", &resp);
+                        info!("Received response: {:?}", resp);
                         resp
                     }
                 }

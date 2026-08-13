@@ -680,7 +680,7 @@ mod tests {
         // Delete and add remaining values until goes through all. Should result in a lot of random deletes and adds.
         while !original_vals.is_empty() {
             let bytes = original_vals.pop_front().unwrap();
-            trace!("Adding new value (left:{}). Need to make space for new record (len:{}).\n - Stored_slots {:?}", original_vals.len(), &bytes.len(), stored_slots);
+            trace!("Adding new value (left:{}). Need to make space for new record (len:{}).\n - Stored_slots {:?}", original_vals.len(), bytes.len(), stored_slots);
             let mut added = false;
             while !added {
                 let try_slot = p.add_value(&bytes);

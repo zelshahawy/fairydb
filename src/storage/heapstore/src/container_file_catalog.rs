@@ -106,7 +106,7 @@ impl ContainerFileCatalog {
         base_dir: P,
         remove_dir_on_drop: bool,
     ) -> Result<Self, std::io::Error> {
-        trace!("Creating/Reading containers in {:?}", &base_dir.as_ref());
+        trace!("Creating/Reading containers in {:?}", base_dir.as_ref());
         // Identify all the directories. A directory corresponds to a database.
         // A file in the directory corresponds to a container.
         // Create a BaseFile for each file and store it in the container.
@@ -192,7 +192,7 @@ impl ContainerFileCatalog {
         // Remove all the containers from the map.
         self.containers.clear();
         // Remove all the files from the base directory.
-        trace!("Removing containers in {:?}", &self.base_dir);
+        trace!("Removing containers in {:?}", self.base_dir);
         for entry in std::fs::read_dir(&self.base_dir).unwrap() {
             let entry = entry.unwrap();
             let file_path = entry.path();

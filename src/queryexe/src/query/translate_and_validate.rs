@@ -114,11 +114,9 @@ impl Environment {
 
     fn get_at(&self, distance: usize, name: &str) -> Option<usize> {
         if distance == 0 {
-            if let Some(index) = self.columns.read().unwrap().get(name) {
-                return Some(*index);
-            } else {
-                return None;
-            }
+            let column_read = self.columns.read().unwrap();
+            let index = column_read.get(name)?;
+            return Some(*index);
         }
 
         if let Some(outer) = &self.outer {

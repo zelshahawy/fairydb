@@ -75,7 +75,7 @@ impl Conductor {
         sql: String,
         db_state: &'static DatabaseState,
     ) -> Result<QueryResult, FairyError> {
-        debug!("Parsing SQL: {:?}", &sql);
+        debug!("Parsing SQL: {:?}", sql);
         match SQLParser::parse_sql(sql) {
             ParserResponse::SQL(ast) => self.run_sql(ast, db_state),
             ParserResponse::SQLError(e) => Err(c_err(format!("SQL error: {}", e).as_str())),
